@@ -1,0 +1,60 @@
+{
+  "epics": [
+    {
+      "id": "MVP-1",
+      "title": "[MVP-P0] Épica: Gestión estructural de la finca",
+      "priority": "P0",
+      "labels": ["epic", "P0", "backend", "data"],
+      "body": "## ÉPICA: Gestión estructural de la finca\n\n### Objetivo de negocio\nEstablece la estructura base del sistema: fincas, potreros y validación de acceso por usuario. Sin esto, no existe modelo de datos.\n\n### Estado actual\n✅ COMPLETO - Fincas, potreros y UserFarm funcionando\n\n### Historias de usuario\n- [ ] MVP-1.1: Crear y administrar fincas (CRUD completo)\n- [ ] MVP-1.2: Definir potreros con parámetros regenerativos\n- [ ] MVP-1.3: Asignar usuarios a fincas con roles\n\n### Impacto regenerativo\nSin esta estructura, no hay base para rotar lotes ni registrar datos. **CRÍTICO para MVP.**\n\n### Checklist Definition of Done\n- [ ] Tests unit >80% cobertura en servicios\n- [ ] Tests integración para endpoints CRUD\n- [ ] Modelos Prisma: Farm, Paddock, UserFarm\n- [ ] Validación acceso por farmId funcional en todos endpoints\n- [ ] Documentación técnica actualizada"
+    },
+    {
+      "id": "MVP-2",
+      "title": "[MVP-P0] Épica: Lotes, animales y estado real",
+      "priority": "P0",
+      "labels": ["epic", "P0", "backend", "data"],
+      "body": "## ÉPICA: Lotes, animales y estado real\n\n### Objetivo de negocio\nRegistro de lotes (rebaños) con estado actual: peso, edad, cantidad de animales, Unidades Animal (UA).\n\n### Estado actual\n✅ COMPLETO - CRUD lotes/animales funcionando, pesajes parciales\n\n### Historias de usuario\n- [ ] MVP-2.1: Crear y administrar lotes con peso inicial\n- [ ] MVP-2.2: Registrar animales individuales (con edad)\n- [ ] MVP-2.3: Visualizar estado actual del lote en tiempo real\n\n### Impacto regenerativo\nLotes con estado actualizado → decisiones de rotación basadas en datos reales, no en intuición.\n\n### Checklist Definition of Done\n- [ ] Modelos: Herd, Animal, Weighing, Movement\n- [ ] Endpoints: POST/GET/PUT /herds, /animals con validación acceso\n- [ ] Tests integración flujo completo (crear lote → add animal → pesaje)\n- [ ] No hay bugs P0-P1 abiertos\n- [ ] Documentación usuario completada"
+    },
+    {
+      "id": "MVP-3",
+      "title": "[MVP-P0] Épica: Rotación y descanso",
+      "priority": "P0",
+      "labels": ["epic", "P0", "backend"],
+      "body": "## ÉPICA: Rotación y descanso\n\n### Objetivo de negocio\nGestión inteligente de rotación de lotes entre potreros, respetando descanso mínimo obligatorio. BASE de ganadería regenerativa.\n\n### Estado actual\n✅ PARCIAL - Movimientos registran, pero falta validación descanso + cálculo días\n\n### Historias de usuario\n- [ ] MVP-3.1: Registrar movimientos entrada/salida de lotes\n- [ ] MVP-3.2: Bloquear doble ocupación (1 lote activo/potrero)\n- [ ] MVP-3.3: Calcular días de descanso y ocupación\n- [ ] MVP-3.4: Validar descanso mínimo ANTES de permitir movimiento\n\n### Impacto regenerativo\n**CRÍTICO.** Sin validación descanso, sistema no es regenerativo. Pánico si falta.\n\n### Gaps identificados\n- ❌ MVP-3.4 NO IMPLEMENTADO: No hay guard en POST /movements validando minRestDays\n\n### Checklist Definition of Done\n- [ ] MVP-3.4 implementado con tests integración\n- [ ] Guard validando minRestDays antes de crear Movement\n- [ ] Frontend: Alert bloqueante si descanso insuficiente\n- [ ] Documentación: Explicar lógica descanso en README\n- [ ] Tests E2E: Scenario descanso OK vs insuficiente"
+    },
+    {
+      "id": "MVP-4",
+      "title": "[MVP-P0] Épica: Pesajes (báscula + cinta métrica)",
+      "priority": "P0",
+      "labels": ["epic", "P0", "backend", "frontend", "ux"],
+      "body": "## ÉPICA: Pesajes (báscula + cinta métrica bovina)\n\n### Objetivo de negocio\nRegistrar peso real (báscula) o estimar con cinta métrica. Cinta métrica = democracia (sin báscula costosa).\n\n### Estado actual\n✅ BACKEND COMPLETO - Campos Weighing.method, chestGirthCm, bodyLengthCm, estimatedWeightKg listos\n⚠️ FRONTEND PARCIAL - Formulario básico, sin UI especializada\n\n### Historias de usuario\n- [ ] MVP-4.1: Registrar pesaje báscula (weight + realWeightKg)\n- [ ] MVP-4.2: Registrar pesaje cinta (perímetro + largo + estimación automática)\n- [ ] MVP-4.3: Comparar real vs estimado (análisis precisión)\n- [ ] MVP-4.4: Actualizar UA del lote tras pesaje automáticamente\n\n### Impacto regenerativo\n**DIFERENCIADOR ÚNICO:** Cinta métrica con calibración adaptativa. Permite pequeños criadores acceso a datos precisos.\n\n### Gaps identificados\n- ⚠️ MVP-4.2 PARCIAL: UI formulario especializado falta (pasos: método → medidas → preview → confirmar)\n- ❌ MVP-4.3 NO IMPLEMENTADO: Tabla/gráfica comparativa real vs estimado\n\n### Checklist Definition of Done\n- [ ] MVP-4.2: Formulario wizard 3 pasos con preview\n- [ ] MVP-4.3: Tabla comparativa con scatter plot\n- [ ] Tests E2E: Capturar cinta → verificar estimatedWeightKg calculado\n- [ ] Documentación: Guía usuario cómo usar cinta métrica"
+    },
+    {
+      "id": "MVP-5",
+      "title": "[MVP-P0] Épica: Aforos y forraje",
+      "priority": "P0",
+      "labels": ["epic", "P0", "backend", "frontend", "ux"],
+      "body": "## ÉPICA: Aforos y forraje\n\n### Objetivo de negocio\nRegistrar disponibilidad de forraje (kg MS/ha) y calcular días recomendados de ocupación basado en oferta/demanda.\n\n### Estado actual\n✅ BACKEND COMPLETO - Campos ForageSample extendidos, cálculos kg/ha listos\n⚠️ FRONTEND PARCIAL - Tablas de aforos, falta wizard guiado\n\n### Historias de usuario\n- [ ] MVP-5.1: Wizard aforo guiado 4 pasos (accesible para técnico sin capacitación)\n- [ ] MVP-5.2: Calcular kg MS/ha automáticamente\n- [ ] MVP-5.3: Calcular días recomendados (oferta vs demanda UA × consumo)\n\n### Impacto regenerativo\nOferta/demanda = BASE de decisión rotación. Sin esto, es adivinanza.\n\n### Gaps identificados\n- ❌ MVP-5.1 NO IMPLEMENTADO: Wizard stepper UI con 4 pasos\n- ❌ MVP-5.3 NO IMPLEMENTADO: Endpoint GET /paddocks/:id/recommended-days?herdId=\n\n### Checklist Definition of Done\n- [ ] MVP-5.1: Stepper component con validación cada paso\n- [ ] MVP-5.3: Backend endpoint + frontend card \"Días recomendados\"\n- [ ] Tests: Cálculos con datos reales (parámetros agrónomo validado)\n- [ ] Tests E2E: Aforo completo → ver días recomendados"
+    },
+    {
+      "id": "MVP-6",
+      "title": "[MVP-P0] Épica: Dashboard operativo",
+      "priority": "P0",
+      "labels": ["epic", "P0", "backend", "frontend", "ux"],
+      "body": "## ÉPICA: Dashboard operativo\n\n### Objetivo de negocio\nVista consolidada de salud de la finca: KPIs clave + alertas operativas proactivas.\n\n### Estado actual\n✅ KPIs básicos (6 gráficas) implementados\n⚠️ Alertas solo parcialmente (lógica existe, UI falta)\n\n### Historias de usuario\n- [ ] MVP-6.1: KPIs operativos (días descanso, carga UA, forraje disponible, etc)\n- [ ] MVP-6.2: Panel de alertas destacado (descanso, sobrepastoreo, pesaje vencido)\n\n### Impacto regenerativo\nOperador necesita ver en 5 segundos si todo está OK o hay problema.\n\n### Gaps identificados\n- ⚠️ MVP-6.2 PARCIAL: Panel alertas existe, pero UI no destaca (missing severity colors, badge count)\n\n### Checklist Definition of Done\n- [ ] MVP-6.2: Panel alertas arriba dashboard con 4 tipos (rojo/amarillo/naranja/azul)\n- [ ] Tests E2E: Crear escenario alerta (ej: movimiento > 7 días) → verificar alert en dashboard\n- [ ] Performance: Dashboard <3s P95 latencia\n- [ ] Documentación: QA explicar cada KPI"
+    },
+    {
+      "id": "MVP-7",
+      "title": "[MVP-P0] Épica: Seguridad y auditoría",
+      "priority": "P0",
+      "labels": ["epic", "P0", "backend", "security"],
+      "body": "## ÉPICA: Seguridad y auditoría\n\n### Objetivo de negocio\nAutenticación JWT confiable + RBAC + auditoría completa de cambios (trazabilidad).\n\n### Estado actual\n✅ JWT + RBAC funcional\n⚠️ Auditoría parcial (createdBy/updatedBy existe, AuditLog falta)\n\n### Historias de usuario\n- [ ] MVP-7.1: Autenticación JWT con login/logout robusto\n- [ ] MVP-7.2: RBAC: Admin/Technician/Viewer roles\n- [ ] MVP-7.3: AuditLog: Trazabilidad de TODOS los cambios con diff\n\n### Impacto regenerativo\nClientes necesitan saber QUIÉN cambió QUÉ y CUÁNDO (compliance agrícola).\n\n### Gaps identificados\n- ❌ MVP-7.3 NO IMPLEMENTADO: Modelo AuditLog + interceptor automático\n\n### Checklist Definition of Done\n- [ ] MVP-7.3: Modelo Prisma AuditLog con fields: entity, entityId, action, changes JSON, userId, createdAt\n- [ ] MVP-7.3: Interceptor NestJS registrando automáticamente\n- [ ] MVP-7.3: Página /audit listando cambios filtrable por entidad/fecha/usuario\n- [ ] Tests: Verificar log en UPDATE de entidad crítica (ej: pesaje)\n- [ ] Documentación: Explicar policy auditoría (cuánto tiempo se retiene)"
+    },
+    {
+      "id": "MVP-8",
+      "title": "[MVP-P0] Épica: Parametría biológica",
+      "priority": "P0",
+      "labels": ["epic", "P0", "backend", "data"],
+      "body": "## ÉPICA: Parametría biológica\n\n### Objetivo de negocio\nConfiguración por finca de parámetros regenerativos (consumo diario, UA óptimo/ha, días descanso ideal, etc).\n\n### Estado actual\n✅ Backend: Modelo Parameter + seed con valores defaults\n⚠️ Frontend: CRUD parámetros falta UI\n\n### Historias de usuario\n- [ ] MVP-8.1: CRUD parámetros por finca (admin only)\n- [ ] MVP-8.2: Valores predeterminados al crear finca\n\n### Impacto regenerativo\nCada finca tiene ecología diferente. Parámetros customizables = sistema adaptativo.\n\n### Gaps identificados\n- ❌ MVP-8.1 NO IMPLEMENTADO: Frontend UI para admin editar parámetros\n\n### Checklist Definition of Done\n- [ ] MVP-8.1: Página /admin/parameters con tabla edit inline\n- [ ] Tests: Guardar parámetro → verificar impacto en cálculo (ej: días recomendados)\n- [ ] Documentación: Qué significa cada parámetro (guía agrónomo)"
+    }
+  ]
+}

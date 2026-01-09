@@ -1,0 +1,49 @@
+Vibes coding
+Spec Driven Design
+
+Técnicas avanzadas de prompt engineering en programación
+
+
+Técnicas avanzadas: 
+
+
+- USO DEL MODELO ADECUADO:
+PARA PLANIFICAR -> RAZONADOR
+PARA EJECUTAR -> GPT
+
+- MEJOR EN INGLES (DE MOMENTO)
+- GUARADA LOS PROMPT QUE FUNCIONEN
+
+
+- Meta-prompting
+
+"Dame un prompt mejorado 
+
+- Q AND A Prompting
+
+"Antes de empezar, preguntame todas tus dudas"
+El modelo nos ayuda
+
+- Pros y Contras
+Evaluar alternativas y ser crítico
+
+- Chain-of-throught (CoT) paso a paso
+
+
+Rol
+Eres un experto arquitecto desarrollador de software 
+
+Objetivo
+Quiero revisar la base de código ya lista para mejorar la aplicación 
+
+Analiza el estado actual y propón un plan detallado paso a paso de lo que habría que hacer, revisando cuidadosamente cada paso. No crees código aun.
+
+
+
+pregunta después:
+Detallame la fase 1.Indicame los archivos afectados, qué habría que cambiar. No hagas código aún.
+
+luego pedir y después del resultado que este bien hecho continuar con los demas
+Vamos a comenzar por el paso 1.1.
+
+Continua con los modelos a modificar

@@ -1,0 +1,6 @@
+@echo off
+cd /d c:\Users\DanielVillamizar\GanaderiaRegenerativa\apps\api
+echo Limpiando carpeta dist...
+if exist dist rmdir /s /q dist
+echo Iniciando API en modo desarrollo...
+call npx @nestjs/cli start --watch

@@ -1,0 +1,34 @@
+Dv1ll4m1z4r4
+M4gr0t11*
+
+$rg="lama-rg-dev01"
+$loc="centralus"
+$deployName="main-webapp0001"
+$webApp="lama-backend-dev0001"
+$plan="lama-plan-dev"
+$pg="lamapgdev0001"
+$kv="lama-kv-dev0001"
+$storage="lamastaticdev0001"   
+$insights="lama-ai-dev0001"
+
+az group create -n $rg -l $loc
+cd "C:\Users\DanielVillamizar\WebPageLAMAMedellinFoundation\infra"
+az bicep build --file main-webapp.bicep
+
+az deployment group create `
+  -g $rg `
+  -n $deployName `
+  -f main-webapp.bicep `
+  -p webAppName=$webApp `
+     planName=$plan `
+     planSkuName="B1" `
+     postgresServerName=$pg `
+     postgresAdminPassword="P@ssw0rd!ChangeMe" `
+     keyVaultName=$kv `
+     storageAccountName=$storage `
+     insightsName=$insights `
+     location=$loc
+
+$principalId = az webapp identity show -n $webApp -g $rg --query principalId -o tsv
+$kvId = az keyvault show -n $kv --query id -o tsv
+az role assignment create --role "Key Vault Secrets User" --assignee $principalId --scope $kvId

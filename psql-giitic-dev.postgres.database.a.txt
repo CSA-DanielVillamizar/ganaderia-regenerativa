@@ -1,0 +1,5 @@
+psql-giitic-dev.postgres.database.azure.com
+pgadmin
+G7p!w4Qz#Lm92tHs
+
+jdbc:postgresql://psql-giitic-dev.postgres.database.azure.com:5432/postgres?user=pgadmin&password=G7p!w4Qz#Lm92tHs&sslmode=require

@@ -1,0 +1,10 @@
+Integraciones con bancos
+con compras
+viajes éxito
+
+con Bancolombia d una estrauctura de corpetas
+
+drop: pactia va hacia Bancolombia con unos lineamientos
+
+pickup : pagos recaudos: ingresa alos recursos y extrae lo necesario  traves sftp con una conexión H2H
+eligieron pickup a traves d un servidor 

@@ -1,0 +1,295 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ============= Models =============
+
+/// Usuario del sistema
+model User {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  password  String
+  name      String
+  role      String    @default("VIEWER")
+  active    Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  // Relaciones
+  userFarms UserFarm[]
+
+  @@index([email])
+  @@index([active])
+}
+
+/// Finca (granja)
+model Farm {
+  id        String    @id @default(cuid())
+  name      String
+  location  String?
+  hectares  Float?
+  active    Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  createdBy String?
+  updatedBy String?
+  deletedAt DateTime?
+
+  // Relaciones
+  userFarms  UserFarm[]
+  paddocks   Paddock[]
+  herds      Herd[]
+  cycles     Cycle[]
+  parameters Parameter[]
+
+  tapeCalibration TapeCalibration?
+
+  @@index([active])
+}
+
+/// Relación usuario-finca (permisos)
+model UserFarm {
+  id        String   @id @default(cuid())
+  userId    String
+  farmId    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  farm Farm @relation(fields: [farmId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, farmId])
+  @@index([userId])
+  @@index([farmId])
+}
+
+/// Potrero (parcela para pastoreo)
+model Paddock {
+  id          String    @id @default(cuid())
+  farmId      String
+  name        String
+  hectares    Float
+  pastureType String?
+  minRestDays Int?
+  description String?
+  active      Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  createdBy   String?
+  updatedBy   String?
+  deletedAt   DateTime?
+  lastExitDate DateTime?           // P0.1: Última salida de lote - para calcular descanso
+
+  farm          Farm           @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  forageSamples ForageSample[]
+  movements     Movement[]
+
+  @@index([farmId])
+  @@index([active])
+}
+
+/// Lote (grupo de animales)
+model Herd {
+  id            String    @id @default(cuid())
+  farmId        String
+  name          String
+  initialWeight Float
+  currentWeight Float?
+  currentUA     Float?    // P0.2: Unidades Animal calculadas
+  animalCount   Int
+  description   String?
+  active        Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  createdBy     String?
+  updatedBy     String?
+  deletedAt     DateTime?
+
+  farm      Farm       @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  animals   Animal[]
+  weighings Weighing[]
+  movements Movement[]
+  cycles    Cycle[]
+
+  @@index([farmId])
+  @@index([active])
+}
+
+/// Animal individual
+model Animal {
+  id            String    @id @default(cuid())
+  herdId        String
+  earTag        String?
+  gender        String?
+  birthDate     DateTime?
+  initialWeight Float?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  herd      Herd       @relation(fields: [herdId], references: [id], onDelete: Cascade)
+  weighings Weighing[]
+
+  @@index([herdId])
+  @@index([earTag])
+}
+
+/// Pesaje
+model Weighing {
+  id          String   @id @default(cuid())
+  herdId      String
+  animalId    String?
+  weight      Float
+  animalCount Int
+  notes       String?
+  recordedAt  DateTime
+  createdAt   DateTime @default(now())
+  createdBy   String?
+
+  // Método de pesaje: báscula real o cinta métrica
+  method             String  @default("SCALE") // SCALE | TAPE
+  chestGirthCm       Float?
+  bodyLengthCm       Float?
+  estimatedWeightKg  Float?
+  realWeightKg       Float?
+  errorMarginPercent Float?
+
+  herd   Herd    @relation(fields: [herdId], references: [id], onDelete: Cascade)
+  animal Animal? @relation(fields: [animalId], references: [id], onDelete: SetNull)
+
+  @@index([herdId])
+  @@index([recordedAt])
+}
+
+/// Ciclo de rotación
+model Cycle {
+  id        String    @id @default(cuid())
+  farmId    String
+  herdId    String
+  status    String    @default("ACTIVE")
+  startDate DateTime
+  endDate   DateTime?
+  notes     String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  createdBy String?
+  updatedBy String?
+
+  farm      Farm       @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  herd      Herd       @relation(fields: [herdId], references: [id], onDelete: Cascade)
+  movements Movement[]
+
+  @@index([farmId])
+  @@index([herdId])
+  @@index([status])
+}
+
+/// Movimiento (entrada/salida de lote a potrero)
+model Movement {
+  id        String    @id @default(cuid())
+  herdId    String
+  paddockId String
+  cycleId   String?
+  type      String
+  status    String    @default("ACTIVE") // ACTIVE, CLOSED
+  entryDate DateTime
+  exitDate  DateTime?
+  notes     String?
+  createdAt DateTime  @default(now())
+  createdBy String?
+  updatedAt DateTime  @default(now()) @updatedAt
+  updatedBy String?
+
+  herd    Herd    @relation(fields: [herdId], references: [id], onDelete: Cascade)
+  paddock Paddock @relation(fields: [paddockId], references: [id], onDelete: Cascade)
+  cycle   Cycle?  @relation(fields: [cycleId], references: [id], onDelete: SetNull)
+
+  @@index([herdId])
+  @@index([paddockId])
+  @@index([entryDate])
+  @@index([status])
+}
+
+/// Aforo (muestra de forraje)
+model ForageSample {
+  id           String   @id @default(cuid())
+  paddockId    String
+  kgPerHectare Float
+  dryMatter    Float
+  sampleDate   DateTime
+  notes        String?
+  createdAt    DateTime @default(now())
+  createdBy    String?
+
+  // Campos extendidos para cálculo guiado de aforo
+  frameAreaM2        Float?
+  freshWeightKg      Float?
+  dryMatterPercent   Float?
+  utilizationPercent Float?
+  kgMSPerHa          Float?
+
+  paddock Paddock @relation(fields: [paddockId], references: [id], onDelete: Cascade)
+
+  @@index([paddockId])
+  @@index([sampleDate])
+}
+
+/// Parámetros de cálculo (configurables por finca)
+model Parameter {
+  id          String   @id @default(cuid())
+  farmId      String
+  key         String
+  value       String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  updatedBy   String?
+
+  farm Farm @relation(fields: [farmId], references: [id], onDelete: Cascade)
+
+  @@unique([farmId, key])
+  @@index([farmId])
+}
+
+/// Calibración de fórmula de cinta métrica por finca
+model TapeCalibration {
+  id        String   @id @default(cuid())
+  farmId    String   @unique
+  divisor   Int      @default(11877) // Fórmula: (girth² × length) / divisor
+  status    String   @default("PENDING") // PENDING | VALIDATED
+  notes     String?
+  appliedDate DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  updatedBy String?
+
+  farm      Farm                     @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  history   TapeCalibrationHistory[]
+
+  @@index([farmId])
+  @@index([status])
+}
+
+/// Historial de calibraciones
+model TapeCalibrationHistory {
+  id               String   @id @default(cuid())
+  farmId           String
+  previousDivisor  Int
+  newDivisor       Int
+  samplesUsed      Int
+  rmseError        Float
+  createdAt        DateTime @default(now())
+
+  calibration TapeCalibration @relation(fields: [farmId], references: [farmId], onDelete: Cascade)
+
+  @@index([farmId])
+  @@index([createdAt])
+}

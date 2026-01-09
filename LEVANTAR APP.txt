@@ -1,0 +1,71 @@
+
+
+GitHub Copilot: ## 📋 **COMANDOS EN ORDEN - CMD**
+
+### **PASO 1: Recompilar API con el fix**
+```cmd
+cd c:\Users\DanielVillamizar\GanaderiaRegenerativa\apps\api
+npm run build
+```
+
+### **PASO 2: Iniciar API**
+```cmd
+node dist\apps\api\src\main
+```
+
+Espera ver:
+```
+[Nest] XXXXX  - XX/XX/XXXX, XX:XX:XX XX     LOG [NestFactory] Starting Nest application...
+[Nest] XXXXX  - XX/XX/XXXX, XX:XX:XX XX     LOG [NestApplication] Nest application successfully started
+```
+
+### **PASO 3: Verificar Health Check** (nueva ventana CMD)
+```cmd
+curl http://localhost:3001/health
+```
+
+O en PowerShell:
+```powershell
+Invoke-RestMethod http://localhost:3001/health
+```
+
+---
+
+## 🎯 **RESUMEN COMPLETO**
+
+**Terminal 1 (API):**
+```cmd
+cd c:\Users\DanielVillamizar\GanaderiaRegenerativa\apps\api && npm run build && node dist\apps\api\src\main
+```
+
+**Terminal 2 (Web) - ya lo tienes corriendo:**
+```cmd
+cd c:\Users\DanielVillamizar\GanaderiaRegenerativa\apps\web && npm run dev
+```
+
+---
+
+## ✅ **URLs FINALES**
+
+- 🌐 **Web**: http://localhost:3000
+- 🔌 **API**: http://localhost:3001/api/v1
+- ✅ **Health**: http://localhost:3001/health
+- 👤 **Login**: admin@magrotec.com / Admin123!
+
+
+
+
+
+
+REM Paso 1: Ir al directorio API
+cd c:\Users\DanielVillamizar\GanaderiaRegenerativa\apps\api
+
+REM Paso 2: Eliminar BD antigua (si existe)
+del /q prisma\dev.db
+
+REM Paso 3: Crear esquema nuevo
+npx prisma db push --skip-generate
+
+REM Paso 4: Llenar con datos (usuario admin creado)
+node prisma/seed.js
+

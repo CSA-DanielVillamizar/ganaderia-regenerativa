@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:16-alpine
+    container_name: ganaderia_db
+    environment:
+      POSTGRES_USER: ganaderia
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: ganaderia_dev
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ganaderia']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # NestJS API
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: ganaderia_api
+    environment:
+      DATABASE_URL: 'postgresql://ganaderia:password123@db:5432/ganaderia_dev'
+      JWT_SECRET: 'tu-clave-secreta-super-segura-cambiar-en-produccion'
+      JWT_EXPIRATION: '24h'
+      PORT: 3000
+      CORS_ORIGIN: 'http://localhost:3001'
+      NODE_ENV: development
+    ports:
+      - '3000:3000'
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./apps/api/src:/app/src
+    command: npm run dev
+
+  # Next.js Web
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    container_name: ganaderia_web
+    environment:
+      NEXT_PUBLIC_API_URL: 'http://localhost:3000/api/v1'
+      NODE_ENV: development
+    ports:
+      - '3001:3000'
+    depends_on:
+      - api
+    volumes:
+      - ./apps/web/src:/app/src
+
+volumes:
+  postgres_data:
+    driver: local
