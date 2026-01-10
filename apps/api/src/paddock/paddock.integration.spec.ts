@@ -95,16 +95,29 @@ describe('PaddockController (Integration) - P0.2', () => {
   }, 30000);
 
   afterAll(async () => {
-    // Cleanup
+    // Cleanup in correct order: avoid cascade conflicts
+    // 1. Delete movements first (depends on herd + paddock)
     await prisma.movement.deleteMany({ where: { paddockId } });
-    await prisma.paddock.delete({ where: { id: paddockId } });
-    await prisma.herd.delete({ where: { id: herdId } });
-    await prisma.userFarm.delete({
-      where: { userId_farmId: { userId, farmId } },
-    });
-    await prisma.farm.delete({ where: { id: farmId } });
-    await prisma.user.delete({ where: { id: userId } });
+    await prisma.movement.deleteMany({ where: { herdId } });
     
+    // 2. Delete herd (may have weighings)
+    await prisma.weighing.deleteMany({ where: { herdId } });
+    await prisma.herd.deleteMany({ where: { id: herdId } }); // idempotent deleteMany
+    
+    // 3. Delete paddock (may have forage samples)
+    await prisma.forageSample.deleteMany({ where: { paddockId } });
+    await prisma.paddock.deleteMany({ where: { id: paddockId } }); // idempotent deleteMany
+    
+    // 4. Delete user associations (use deleteMany without composite key)
+    await prisma.userFarm.deleteMany({ where: { userId } });
+    
+    // 5. Delete farm
+    await prisma.farm.deleteMany({ where: { id: farmId } });
+    
+    // 6. Delete user
+    await prisma.user.deleteMany({ where: { id: userId } });
+    
+    // 7. Close connections properly
     await prisma.$disconnect();
     await app.close();
   });

@@ -19,7 +19,8 @@ export function Sidebar() {
   const logout = useLogout();
 
   return (
-    <div className="bg-green-800 text-white w-64 min-h-screen p-6 fixed hidden lg:block">
+    <aside className="bg-green-800 text-white w-64 h-full overflow-y-auto hidden lg:block flex-shrink-0">
+      <div className="p-6">
       <div className="mb-8">
         <h2 className="text-2xl font-bold">🐄 Magrotec</h2>
         <p className="text-green-200 text-xs mt-1">Ganadería Regenerativa</p>
@@ -53,7 +54,8 @@ export function Sidebar() {
           Salir
         </Button>
       </div>
-    </div>
+      </div>
+    </aside>
   );
 }
 
@@ -61,7 +63,7 @@ export function BottomNav() {
   const logout = useLogout();
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 lg:hidden flex justify-around">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 p-4 lg:hidden flex justify-around shadow-lg">
       {navItems.map((item) => {
         const Icon = item.icon;
         return (
@@ -80,6 +82,6 @@ export function BottomNav() {
         <LogOut className="w-6 h-6 mb-1" />
         Salir
       </button>
-    </div>
+    </nav>
   );
 }

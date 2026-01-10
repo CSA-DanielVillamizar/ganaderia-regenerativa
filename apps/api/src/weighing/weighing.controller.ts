@@ -32,9 +32,30 @@ export class WeighingController {
     return this.weighingService.findByHerd(herdId, req.user.id);
   }
 
-  @Get(':herdId/history')
-  @ApiOperation({ summary: 'Obtener historial de pesajes' })
-  getHistory(@Param('herdId') herdId: string, @Request() req: any) {
-    return this.weighingService.getHistory(herdId, req.user.id);
+  @Get('herd/:herdId/history')
+  @ApiOperation({
+    summary: 'P0.6 - Obtener historial de pesajes con paginación',
+    description: `
+      Retorna historial completo de pesajes del hato con:
+      - Paginación (page, limit)
+      - Filtros de fecha (from, to)
+      - Cálculo de UA por pesaje
+      - Estado actual del hato (currentWeight, currentUA)
+    `,
+  })
+  getHistory(
+    @Param('herdId') herdId: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('from') from?: string,
+    @Query('to') to?: string,
+    @Request() req?: any,
+  ) {
+    return this.weighingService.getHistory(herdId, req.user.id, {
+      page: page ? parseInt(page, 10) : undefined,
+      limit: limit ? parseInt(limit, 10) : undefined,
+      from: from,
+      to: to,
+    });
   }
 }

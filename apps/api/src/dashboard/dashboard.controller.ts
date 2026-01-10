@@ -76,4 +76,23 @@ export class DashboardController {
   getPaddockStatuses(@Param('farmId') farmId: string, @Request() req: any) {
     return this.dashboardService.getPaddockStatuses(farmId, req.user.id);
   }
+
+  @Get(':farmId/decision-today')
+  @ApiOperation({
+    summary: 'P0.7 - Dashboard de decisión diaria',
+    description: `
+      Retorna información clave para tomar decisión de rotación hoy:
+      - readyPaddocks: Potreros listos para ingresar (descanso >= minRestDays)
+      - warnings: Alertas de forraje bajo, descanso insuficiente, rotación retrasada
+      - recommendedNextPaddock: Sugerencia del mejor potrero para rotar
+
+      Usa datos de P0.3 (aforos), P0.4 (días recomendados), P0.5 (descanso)
+    `,
+  })
+  @ApiResponse({ status: 200, description: 'Decisión generada' })
+  @ApiResponse({ status: 401, description: 'No autenticado' })
+  @ApiResponse({ status: 403, description: 'Acceso denegado a la finca' })
+  getDecisionToday(@Param('farmId') farmId: string, @Request() req: any) {
+    return this.dashboardService.getDecisionToday(farmId, req.user.id);
+  }
 }

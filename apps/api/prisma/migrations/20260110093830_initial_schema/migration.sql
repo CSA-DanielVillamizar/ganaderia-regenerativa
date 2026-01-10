@@ -141,7 +141,7 @@ CREATE TABLE "Movement" (
     "updatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedBy" TEXT,
     CONSTRAINT "Movement_herdId_fkey" FOREIGN KEY ("herdId") REFERENCES "Herd" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT "Movement_paddockId_fkey" FOREIGN KEY ("paddockId") REFERENCES "Paddock" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "Movement_paddockId_fkey" FOREIGN KEY ("paddockId") REFERENCES "Paddock" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT "Movement_cycleId_fkey" FOREIGN KEY ("cycleId") REFERENCES "Cycle" ("id") ON DELETE SET NULL ON UPDATE CASCADE
 );
 
@@ -150,15 +150,17 @@ CREATE TABLE "ForageSample" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "paddockId" TEXT NOT NULL,
     "kgPerHectare" REAL NOT NULL,
-    "dryMatter" REAL NOT NULL,
+    "measurementType" TEXT NOT NULL DEFAULT 'GREEN',
+    "dryMatterPercent" REAL,
+    "utilizationPercent" REAL NOT NULL DEFAULT 70,
+    "availableForageKgMS" REAL,
     "sampleDate" DATETIME NOT NULL,
     "notes" TEXT,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "createdBy" TEXT,
+    "dryMatter" REAL,
     "frameAreaM2" REAL,
     "freshWeightKg" REAL,
-    "dryMatterPercent" REAL,
-    "utilizationPercent" REAL,
     "kgMSPerHa" REAL,
     CONSTRAINT "ForageSample_paddockId_fkey" FOREIGN KEY ("paddockId") REFERENCES "Paddock" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );

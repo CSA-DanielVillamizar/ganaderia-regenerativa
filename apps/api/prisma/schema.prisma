@@ -50,6 +50,7 @@ model Farm {
   herds      Herd[]
   cycles     Cycle[]
   parameters Parameter[]
+  farmParameters FarmParameter[] @relation("FarmParametersOverride")
 
   tapeCalibration TapeCalibration?
 
@@ -220,21 +221,23 @@ model Movement {
 
 /// Aforo (muestra de forraje)
 model ForageSample {
-  id           String   @id @default(cuid())
-  paddockId    String
-  kgPerHectare Float
-  dryMatter    Float
-  sampleDate   DateTime
-  notes        String?
-  createdAt    DateTime @default(now())
-  createdBy    String?
+  id                  String   @id @default(cuid())
+  paddockId           String
+  kgPerHectare        Float    // kg/ha disponible
+  measurementType     String   @default("GREEN") // GREEN | DRY_MATTER
+  dryMatterPercent    Float?   // % de MS si es GREEN (0-100)
+  utilizationPercent  Float    @default(70) // % utilización (por defecto 70%)
+  availableForageKgMS Float?   // Calculado: forraje disponible en MS
+  sampleDate          DateTime
+  notes               String?
+  createdAt           DateTime @default(now())
+  createdBy           String?
 
-  // Campos extendidos para cálculo guiado de aforo
-  frameAreaM2        Float?
-  freshWeightKg      Float?
-  dryMatterPercent   Float?
-  utilizationPercent Float?
-  kgMSPerHa          Float?
+  // Campos legacy (deprecated pero soportados para compatibilidad)
+  dryMatter      Float?       // Legacy: valor anterior de MS
+  frameAreaM2    Float?       // Marco para muestreo
+  freshWeightKg  Float?       // Peso fresco
+  kgMSPerHa      Float?       // kg MS/ha (calculado)
 
   paddock Paddock @relation(fields: [paddockId], references: [id], onDelete: Cascade)
 
@@ -254,6 +257,23 @@ model Parameter {
   updatedBy   String?
 
   farm Farm @relation(fields: [farmId], references: [id], onDelete: Cascade)
+
+  @@unique([farmId, key])
+  @@index([farmId])
+}
+
+/// Parámetros específicos por finca (overrides globales)
+model FarmParameter {
+  id          String   @id @default(cuid())
+  farmId      String
+  key         String
+  value       String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  updatedBy   String?
+
+  farm Farm @relation("FarmParametersOverride", fields: [farmId], references: [id], onDelete: Cascade)
 
   @@unique([farmId, key])
   @@index([farmId])
