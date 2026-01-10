@@ -1,25 +1,17 @@
 import { Injectable, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
-import { ParameterService } from '../parameter/parameter.service';
-import { CreateWeighingDto, WeighingHistoryResponse } from '@shared/index';
+import { CreateWeighingDto } from '@shared/index';
 
 @Injectable()
 export class WeighingService {
-  constructor(
-    private prisma: PrismaService,
-    private parameterService: ParameterService,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
   /**
-   * P0.6 - Registrar pesaje
-   * Al crear pesaje:
-   * 1. Actualizar herd.currentWeight (promedio por animal)
-   * 2. Recalcular herd.currentUA usando parámetro ua_weight_kg
+   * Registrar pesaje
    */
   async create(dto: CreateWeighingDto, userId: string) {
     const herd = await this.prisma.herd.findUniqueOrThrow({
       where: { id: dto.herdId },
-      include: { farm: true },
     });
 
     await this.verifyFarmAccess(herd.farmId, userId);
@@ -48,21 +40,11 @@ export class WeighingService {
       const _errorMarginPercent = Math.abs(realWeightKg - estimatedWeightKg) / realWeightKg * 100;
     }
 
-    // 1. Actualizar peso actual del lote (promedio por animal)
+    // Actualizar peso actual del lote (promedio por animal)
     const averagePerAnimal = weightToStore / dto.animalCount;
-
-    // 2. Recalcular UA usando parámetro ua_weight_kg (default 450 kg)
-    const uaWeightKg = await this.parameterService.getParameter(herd.farmId, 'ua_weight_kg', '450');
-    const uaWeightValue = parseFloat(uaWeightKg) || 450;
-    const totalWeight = averagePerAnimal * herd.animalCount;
-    const currentUA = totalWeight / uaWeightValue;
-
     await this.prisma.herd.update({
       where: { id: dto.herdId },
-      data: {
-        currentWeight: averagePerAnimal,
-        currentUA: currentUA,
-      },
+      data: { currentWeight: averagePerAnimal },
     });
 
     return this.prisma.weighing.create({
@@ -74,7 +56,6 @@ export class WeighingService {
         notes: dto.notes,
         recordedAt: new Date(),
         createdBy: userId,
-        method: method,
       },
     });
   }
@@ -96,105 +77,27 @@ export class WeighingService {
   }
 
   /**
-   * P0.6 - Obtener historial de pesajes con paginación y filtros
-   * Query params: page, limit, from, to
+   * Obtener historial de pesajes
    */
-  async getHistory(
-    herdId: string,
-    userId: string,
-    options?: {
-      page?: number;
-      limit?: number;
-      from?: string;
-      to?: string;
-    },
-  ): Promise<WeighingHistoryResponse> {
+  async getHistory(herdId: string, userId: string) {
     const herd = await this.prisma.herd.findUniqueOrThrow({
       where: { id: herdId },
-      select: {
-        id: true,
-        name: true,
-        farmId: true,
-        currentWeight: true,
-        currentUA: true,
-        animalCount: true,
-      },
     });
 
     await this.verifyFarmAccess(herd.farmId, userId);
 
-    // Paginación (default page=1, limit=50)
-    const page = options?.page ?? 1;
-    const limit = options?.limit ?? 50;
-    const skip = (page - 1) * limit;
-
-    // Filtros de fecha
-    const dateFilter: any = {};
-    if (options?.from) {
-      dateFilter.gte = new Date(options.from);
-    }
-    if (options?.to) {
-      dateFilter.lte = new Date(options.to);
-    }
-
-    const whereClause: any = { herdId };
-    if (Object.keys(dateFilter).length > 0) {
-      whereClause.recordedAt = dateFilter;
-    }
-
-    // Contar total (sin paginación)
-    const totalCount = await this.prisma.weighing.count({
-      where: whereClause,
-    });
-
-    // Obtener pesajes con paginación
     const weighings = await this.prisma.weighing.findMany({
-      where: whereClause,
-      orderBy: { recordedAt: 'desc' },
-      skip: skip,
-      take: limit,
+      where: { herdId },
+      orderBy: { recordedAt: 'asc' },
+      take: 50,
     });
 
-    // Obtener parámetro ua_weight_kg para calcular UA
-    const uaWeightKg = await this.parameterService.getParameter(herd.farmId, 'ua_weight_kg', '450');
-    const uaWeightValue = parseFloat(uaWeightKg) || 450;
-
-    // Mapear a WeighingHistoryItem
-    const weighingItems = weighings.map((w) => {
-      const avgWeightPerAnimal = w.weight / w.animalCount;
-      const totalHerdWeight = avgWeightPerAnimal * herd.animalCount;
-      const uaValue = totalHerdWeight / uaWeightValue;
-
-      return {
-        id: w.id,
-        weight: w.weight,
-        animalCount: w.animalCount,
-        avgWeightPerAnimal: avgWeightPerAnimal,
-        uaValue: uaValue,
-        notes: w.notes,
-        recordedAt: w.recordedAt.toISOString(),
-        method: w.method,
-        createdAt: w.createdAt.toISOString(),
-      };
-    });
-
-    const totalPages = Math.ceil(totalCount / limit);
-    const hasMore = page < totalPages;
-
-    return {
-      herdId: herd.id,
-      herdName: herd.name,
-      currentWeight: herd.currentWeight,
-      currentUA: herd.currentUA,
-      totalCount,
-      weighings: weighingItems,
-      pagination: {
-        page,
-        limit,
-        totalPages,
-        hasMore,
-      },
-    };
+    return weighings.map((w) => ({
+      date: w.recordedAt,
+      weight: w.weight,
+      ua: w.weight / 450,
+      gain: 0, // Calculado en frontend
+    }));
   }
 
   private async verifyFarmAccess(farmId: string, userId: string) {

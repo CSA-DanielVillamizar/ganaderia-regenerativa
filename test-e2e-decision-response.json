@@ -1,0 +1,196 @@
+﻿{
+    "farmId":  "cmk8oe5zm0002114tgxic313l",
+    "farmName":  "Finca Las Praderas",
+    "timestamp":  "2026-01-10T21:13:08.211Z",
+    "confidenceLevel":  "HIGH",
+    "explainability":  [
+                           {
+                               "reason":  "Descanso de 30 días \u003e= mínimo de 30 días",
+                               "source":  "MOVEMENT_HISTORY",
+                               "weight":  5
+                           },
+                           {
+                               "reason":  "Pesaje reciente disponible para cálculo de consumo",
+                               "source":  "WEIGHING_DATA",
+                               "weight":  3
+                           }
+                       ],
+    "actionChecklist":  [
+                            {
+                                "id":  "forage-cmk8oe61d0008114tn44gs0az",
+                                "action":  "Registrar aforo en potrero \"Potrero 1\"",
+                                "priority":  "URGENT",
+                                "status":  "PENDING",
+                                "context":  "Potrero 1"
+                            },
+                            {
+                                "id":  "forage-cmk8oe61g000a114tkzpf5gmr",
+                                "action":  "Registrar aforo en potrero \"Potrero 2\"",
+                                "priority":  "URGENT",
+                                "status":  "PENDING",
+                                "context":  "Potrero 2"
+                            },
+                            {
+                                "id":  "forage-cmk8oe61p000e114tv02x0wax",
+                                "action":  "Registrar aforo en potrero \"Potrero 4\"",
+                                "priority":  "URGENT",
+                                "status":  "PENDING",
+                                "context":  "Potrero 4"
+                            },
+                            {
+                                "id":  "forage-cmk8oe61r000g114t5ljv60dy",
+                                "action":  "Registrar aforo en potrero \"Potrero 5\"",
+                                "priority":  "URGENT",
+                                "status":  "PENDING",
+                                "context":  "Potrero 5"
+                            },
+                            {
+                                "id":  "forage-cmk8oe61t000i114txkizesun",
+                                "action":  "Registrar aforo en potrero \"Potrero 6\"",
+                                "priority":  "URGENT",
+                                "status":  "PENDING",
+                                "context":  "Potrero 6"
+                            },
+                            {
+                                "id":  "forage-cmk8oe61k000c114t31ddyht8",
+                                "action":  "Registrar aforo en potrero \"Potrero 3\"",
+                                "priority":  "URGENT",
+                                "status":  "PENDING",
+                                "context":  "Potrero 3"
+                            },
+                            {
+                                "id":  "forage-cmk8oe61w000k114tqf3gx8w9",
+                                "action":  "Registrar aforo en potrero \"Potrero 8\"",
+                                "priority":  "URGENT",
+                                "status":  "PENDING",
+                                "context":  "Potrero 8"
+                            },
+                            {
+                                "id":  "forage-cmk8oe61w000m114th0lfhufa",
+                                "action":  "Registrar aforo en potrero \"Potrero 7\"",
+                                "priority":  "URGENT",
+                                "status":  "PENDING",
+                                "context":  "Potrero 7"
+                            },
+                            {
+                                "id":  "weighing-cmk8oe639000o114tsquzkkm5",
+                                "action":  "Registrar pesaje de hato \"Lote A - Novillas\"",
+                                "priority":  "URGENT",
+                                "status":  "PENDING",
+                                "context":  "Lote A - Novillas"
+                            },
+                            {
+                                "id":  "movement-cmk8oe6cf001w114tv7ci4h7p",
+                                "action":  "Cerrar movimiento: Lote A - Novillas en Potrero 1",
+                                "priority":  "URGENT",
+                                "status":  "PENDING",
+                                "context":  "Lote A - Novillas → Potrero 1"
+                            },
+                            {
+                                "id":  "movement-cmk8oe6cy001y114tkwn2b90f",
+                                "action":  "Cerrar movimiento: Lote A - Novillas en Potrero 2",
+                                "priority":  "URGENT",
+                                "status":  "PENDING",
+                                "context":  "Lote A - Novillas → Potrero 2"
+                            },
+                            {
+                                "id":  "movement-cmk8oe6dx0022114t5x1pw2zx",
+                                "action":  "Cerrar movimiento: Lote A - Novillas en Potrero 4",
+                                "priority":  "URGENT",
+                                "status":  "PENDING",
+                                "context":  "Lote A - Novillas → Potrero 4"
+                            },
+                            {
+                                "id":  "movement-cmk8oe6e50024114tjdm3jkq4",
+                                "action":  "Cerrar movimiento: Lote A - Novillas en Potrero 5",
+                                "priority":  "URGENT",
+                                "status":  "PENDING",
+                                "context":  "Lote A - Novillas → Potrero 5"
+                            },
+                            {
+                                "id":  "movement-cmk8oe6d40020114tjoe1rsuy",
+                                "action":  "Cerrar movimiento: Lote A - Novillas en Potrero 3",
+                                "priority":  "URGENT",
+                                "status":  "PENDING",
+                                "context":  "Lote A - Novillas → Potrero 3"
+                            }
+                        ],
+    "readyPaddocks":  [
+                          {
+                              "paddockId":  "cmk8oe61t000i114txkizesun",
+                              "paddockName":  "Potrero 6",
+                              "hectares":  7.53929751544718,
+                              "daysRested":  30,
+                              "minRestDays":  30,
+                              "availableKgMS":  null,
+                              "status":  "READY"
+                          },
+                          {
+                              "paddockId":  "cmk8oe61w000k114tqf3gx8w9",
+                              "paddockName":  "Potrero 8",
+                              "hectares":  5.059150547446323,
+                              "daysRested":  30,
+                              "minRestDays":  30,
+                              "availableKgMS":  null,
+                              "status":  "READY"
+                          },
+                          {
+                              "paddockId":  "cmk8oe61w000m114th0lfhufa",
+                              "paddockName":  "Potrero 7",
+                              "hectares":  5.638695722906416,
+                              "daysRested":  30,
+                              "minRestDays":  30,
+                              "availableKgMS":  null,
+                              "status":  "READY"
+                          }
+                      ],
+    "warnings":  [
+                     {
+                         "type":  "OVERDUE_ROTATION",
+                         "severity":  "high",
+                         "message":  "Potrero 1: 374 días ocupado - considerar rotación",
+                         "paddockId":  "cmk8oe61d0008114tn44gs0az",
+                         "paddockName":  "Potrero 1",
+                         "herdName":  "Lote A - Novillas"
+                     },
+                     {
+                         "type":  "OVERDUE_ROTATION",
+                         "severity":  "high",
+                         "message":  "Potrero 2: 364 días ocupado - considerar rotación",
+                         "paddockId":  "cmk8oe61g000a114tkzpf5gmr",
+                         "paddockName":  "Potrero 2",
+                         "herdName":  "Lote A - Novillas"
+                     },
+                     {
+                         "type":  "OVERDUE_ROTATION",
+                         "severity":  "high",
+                         "message":  "Potrero 4: 344 días ocupado - considerar rotación",
+                         "paddockId":  "cmk8oe61p000e114tv02x0wax",
+                         "paddockName":  "Potrero 4",
+                         "herdName":  "Lote A - Novillas"
+                     },
+                     {
+                         "type":  "OVERDUE_ROTATION",
+                         "severity":  "high",
+                         "message":  "Potrero 5: 334 días ocupado - considerar rotación",
+                         "paddockId":  "cmk8oe61r000g114t5ljv60dy",
+                         "paddockName":  "Potrero 5",
+                         "herdName":  "Lote A - Novillas"
+                     },
+                     {
+                         "type":  "OVERDUE_ROTATION",
+                         "severity":  "high",
+                         "message":  "Potrero 3: 354 días ocupado - considerar rotación",
+                         "paddockId":  "cmk8oe61k000c114t31ddyht8",
+                         "paddockName":  "Potrero 3",
+                         "herdName":  "Lote A - Novillas"
+                     }
+                 ],
+    "recommendedNextPaddock":  {
+                                   "paddockId":  "cmk8oe61t000i114txkizesun",
+                                   "paddockName":  "Potrero 6",
+                                   "daysRested":  30,
+                                   "availableKgMS":  null,
+                                   "reason":  "Mayor descanso (30 días) y forraje disponible"
+                               }
+}

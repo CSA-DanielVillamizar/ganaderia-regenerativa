@@ -6,9 +6,8 @@ import {
   UseGuards,
   Request,
   Query,
-  Param,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags, ApiParam } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ForageService } from './forage.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CreateForageSampleDto } from '@shared/index';
@@ -40,18 +39,5 @@ export class ForageController {
     @Request() req?: any
   ) {
     return this.forageService.findRecentByFarm(farmId, req.user.id, days ? parseInt(days) : 30);
-  }
-
-  @Get('paddock/:paddockId/available')
-  @ApiOperation({ 
-    summary: 'P0.3 - Obtener forraje disponible (en kg MS) para un potrero',
-    description: 'Retorna el último aforo con cálculos de materia seca total disponible'
-  })
-  @ApiParam({ name: 'paddockId', description: 'UUID del potrero', type: 'string' })
-  getAvailableForage(
-    @Param('paddockId') paddockId: string,
-    @Request() req: any
-  ) {
-    return this.forageService.getAvailableForage(paddockId, req.user.id);
   }
 }

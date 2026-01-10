@@ -11,12 +11,8 @@ describe('PaddockService - Stocking Rate', () => {
     paddock: {
       create: jest.fn(),
       findMany: jest.fn(),
-      findUnique: jest.fn(),
       findUniqueOrThrow: jest.fn(),
       update: jest.fn(),
-    },
-    forageSample: {
-      findFirst: jest.fn(),
     },
     movement: {
       findFirst: jest.fn(),
@@ -179,132 +175,6 @@ describe('PaddockService - Stocking Rate', () => {
           herd: true,
         },
       });
-    });
-  });
-
-  // ============= P0.4 - Recommended Days Tests =============
-
-  describe('getRecommendedDays', () => {
-    const userId = 'user-123';
-    const paddockId = 'paddock-456';
-    const farmId = 'farm-789';
-    const herdId = 'herd-001';
-
-    const mockPaddock = {
-      id: paddockId,
-      farmId,
-      name: 'Potrero Norte',
-      hectares: 10,
-      farm: { id: farmId, name: 'Finca Test' },
-    };
-
-    const mockForageSample = {
-      id: 'sample-001',
-      paddockId,
-      availableForageKgMS: 1050, // kg MS/ha
-      sampleDate: new Date('2025-01-10T10:00:00Z'),
-    };
-
-    const mockHerd = {
-      id: herdId,
-      name: 'Hato A',
-      currentWeight: 5000, // kg
-      initialWeight: 4500,
-      animalCount: 10,
-    };
-
-    const mockActiveMovement = {
-      id: 'movement-001',
-      paddockId,
-      herdId,
-      status: 'ACTIVE',
-      herd: mockHerd,
-    };
-
-    beforeEach(() => {
-      mockPrismaService.userFarm.findUnique.mockResolvedValue({ userId, farmId });
-    });
-
-    it('1. GET con paddockId y herds → calcula correctamente', async () => {
-      mockPrismaService.paddock.findUnique.mockResolvedValue(mockPaddock);
-      mockPrismaService.forageSample.findFirst.mockResolvedValue(mockForageSample);
-      mockPrismaService.movement.findFirst.mockResolvedValue(mockActiveMovement);
-
-      const result = await service.getRecommendedDays(paddockId, userId, 2.0);
-
-      expect(result.paddockId).toBe(paddockId);
-      expect(result.totalAvailableKgMS).toBe(10500);
-      expect(result.totalHerdWeightKg).toBe(5000);
-      expect(result.dailyConsumptionKgMS).toBe(100);
-      expect(result.recommendedDays).toBe(105);
-      expect(result.rotationAdvice).toContain('105');
-    });
-
-    it('2. GET sin aforos → 400 BadRequest', async () => {
-      mockPrismaService.paddock.findUnique.mockResolvedValue(mockPaddock);
-      mockPrismaService.forageSample.findFirst.mockResolvedValue(null);
-
-      await expect(service.getRecommendedDays(paddockId, userId, 2.0)).rejects.toThrow(
-        /No hay aforos registrados/
-      );
-    });
-
-    it('3. GET con intakePercent custom → usa valor', async () => {
-      mockPrismaService.paddock.findUnique.mockResolvedValue(mockPaddock);
-      mockPrismaService.forageSample.findFirst.mockResolvedValue(mockForageSample);
-      mockPrismaService.movement.findFirst.mockResolvedValue(mockActiveMovement);
-
-      const result = await service.getRecommendedDays(paddockId, userId, 2.5);
-
-      expect(result.intakePercentDaily).toBe(2.5);
-      expect(result.dailyConsumptionKgMS).toBe(125);
-      expect(result.recommendedDays).toBe(84);
-    });
-
-    it('4. Manejo división por cero (0 herd weight) → BadRequest', async () => {
-      const herdWithZeroWeight = { ...mockHerd, currentWeight: 0, initialWeight: 0 };
-      const movementWithZeroWeight = { ...mockActiveMovement, herd: herdWithZeroWeight };
-
-      mockPrismaService.paddock.findUnique.mockResolvedValue(mockPaddock);
-      mockPrismaService.forageSample.findFirst.mockResolvedValue(mockForageSample);
-      mockPrismaService.movement.findFirst.mockResolvedValue(movementWithZeroWeight);
-
-      await expect(service.getRecommendedDays(paddockId, userId, 2.0)).rejects.toThrow(
-        /no tiene peso registrado/
-      );
-    });
-
-    it('5. Paddock sin movimiento activo → BadRequest', async () => {
-      mockPrismaService.paddock.findUnique.mockResolvedValue(mockPaddock);
-      mockPrismaService.forageSample.findFirst.mockResolvedValue(mockForageSample);
-      mockPrismaService.movement.findFirst.mockResolvedValue(null);
-
-      await expect(service.getRecommendedDays(paddockId, userId, 2.0)).rejects.toThrow(
-        /No hay un hato activo/
-      );
-    });
-
-    it('6. Auth requerido - sin acceso lanza ForbiddenException', async () => {
-      mockPrismaService.paddock.findUnique.mockResolvedValue(mockPaddock);
-      mockPrismaService.userFarm.findUnique.mockResolvedValue(null);
-
-      await expect(service.getRecommendedDays(paddockId, userId, 2.0)).rejects.toThrow(
-        ForbiddenException
-      );
-    });
-
-    it('7. Herd usa initialWeight si currentWeight es null', async () => {
-      const herdWithoutCurrentWeight = { ...mockHerd, currentWeight: null, initialWeight: 4800 };
-      const movementWithInitialWeight = { ...mockActiveMovement, herd: herdWithoutCurrentWeight };
-
-      mockPrismaService.paddock.findUnique.mockResolvedValue(mockPaddock);
-      mockPrismaService.forageSample.findFirst.mockResolvedValue(mockForageSample);
-      mockPrismaService.movement.findFirst.mockResolvedValue(movementWithInitialWeight);
-
-      const result = await service.getRecommendedDays(paddockId, userId, 2.0);
-
-      expect(result.totalHerdWeightKg).toBe(4800);
-      expect(result.dailyConsumptionKgMS).toBe(96);
     });
   });
 });

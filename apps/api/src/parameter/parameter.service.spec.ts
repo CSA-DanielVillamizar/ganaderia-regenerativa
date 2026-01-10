@@ -13,13 +13,6 @@ describe('ParameterService', () => {
       upsert: jest.fn(),
       create: jest.fn(),
     },
-    farmParameter: {
-      findUnique: jest.fn(),
-      create: jest.fn(),
-      upsert: jest.fn(),
-      delete: jest.fn(),
-      findMany: jest.fn(),
-    },
     userFarm: {
       findUnique: jest.fn(),
     },
@@ -48,37 +41,14 @@ describe('ParameterService', () => {
       const key = 'ua_weight_kg';
       const value = '450';
 
-      // No hay override en farm, busca en global
-      mockPrismaService.farmParameter.findUnique.mockResolvedValue(null);
       mockPrismaService.parameter.findUnique.mockResolvedValue({ value });
 
       const result = await service.getParameter(farmId, key, '500');
 
       expect(result).toBe('450');
-      expect(prisma.farmParameter.findUnique).toHaveBeenCalledWith({
-        where: { farmId_key: { farmId, key } },
-      });
       expect(prisma.parameter.findUnique).toHaveBeenCalledWith({
         where: { farmId_key: { farmId, key } },
       });
-    });
-
-    it('debería retornar farm parameter override si existe', async () => {
-      const farmId = 'farm-1';
-      const key = 'ua_weight_kg';
-      const farmValue = '480';
-
-      // Tiene override en farm
-      mockPrismaService.farmParameter.findUnique.mockResolvedValue({ value: farmValue });
-
-      const result = await service.getParameter(farmId, key, '500');
-
-      expect(result).toBe(farmValue);
-      expect(prisma.farmParameter.findUnique).toHaveBeenCalledWith({
-        where: { farmId_key: { farmId, key } },
-      });
-      // No debe buscar en Parameter si lo encontró en FarmParameter
-      expect(prisma.parameter.findUnique).not.toHaveBeenCalled();
     });
 
     it('debería retornar valor default si parámetro no existe', async () => {
@@ -86,7 +56,6 @@ describe('ParameterService', () => {
       const key = 'ua_weight_kg';
       const defaultValue = '500';
 
-      mockPrismaService.farmParameter.findUnique.mockResolvedValue(null);
       mockPrismaService.parameter.findUnique.mockResolvedValue(null);
 
       const result = await service.getParameter(farmId, key, defaultValue);
@@ -100,7 +69,6 @@ describe('ParameterService', () => {
       const farmId = 'farm-1';
       const key = 'ua_weight_kg';
 
-      mockPrismaService.farmParameter.findUnique.mockResolvedValue(null);
       mockPrismaService.parameter.findUnique.mockResolvedValue({ value: '450.5' });
 
       const result = await service.getParameterAsNumber(farmId, key, 400);
@@ -112,7 +80,6 @@ describe('ParameterService', () => {
       const farmId = 'farm-1';
       const key = 'ua_weight_kg';
 
-      mockPrismaService.farmParameter.findUnique.mockResolvedValue(null);
       mockPrismaService.parameter.findUnique.mockResolvedValue({ value: 'invalid' });
 
       const result = await service.getParameterAsNumber(farmId, key, 400);

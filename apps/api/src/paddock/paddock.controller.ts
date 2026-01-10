@@ -93,26 +93,4 @@ export class PaddockController {
   getStockingRate(@Param('id') id: string, @Request() req: any) {
     return this.paddockService.getStockingRate(id, req.user.id);
   }
-
-  @Get(':id/recommended-days')
-  @ApiOperation({
-    summary: 'P0.4 - Calcular días recomendados de pastoreo',
-    description: 'Calcula cuántos días puede pastar el hato en el potrero basado en forraje disponible y consumo diario'
-  })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'Días recomendados calculados con consejo de rotación' 
-  })
-  @ApiResponse({ status: 400, description: 'No hay aforos o hato activo en el potrero' })
-  @ApiResponse({ status: 401, description: 'No autenticado' })
-  @ApiResponse({ status: 403, description: 'Acceso denegado a la finca' })
-  @ApiResponse({ status: 404, description: 'Potrero no encontrado' })
-  getRecommendedDays(
-    @Param('id') id: string,
-    @Query('intakePercent') intakePercent?: string,
-    @Request() req?: any
-  ) {
-    const intakePercentNumber = intakePercent ? parseFloat(intakePercent) : 2.0;
-    return this.paddockService.getRecommendedDays(id, req.user.id, intakePercentNumber);
-  }
 }

@@ -162,22 +162,11 @@ export class MovementService {
    * P0.5: Validar que el potrero ha completado su descanso mínimo
    * Previene entradas prematuras que afecten recuperación del forraje
    */
-  /**
-   * P0.5 - VALIDACIÓN DESCANSO POTRERO
-   * Valida que el potrero ha descansado el tiempo mínimo requerido
-   * desde el último movimiento cerrado (exitDate)
-   * 
-   * @param paddockId - UUID del potrero
-   * @param proposedEntryDate - Fecha propuesta de entrada
-   * @param minRestDays - Días mínimos de descanso requeridos
-   * @throws BadRequestException si no ha descansado suficiente
-   */
   private async validateMinimumRestDays(
     paddockId: string,
     proposedEntryDate: Date,
     minRestDays: number
   ): Promise<void> {
-    // Buscar último movimiento cerrado con exitDate
     const lastClosedMovement = await this.prisma.movement.findFirst({
       where: {
         paddockId,
@@ -193,30 +182,17 @@ export class MovementService {
       return;
     }
 
-    // Calcular días de descanso real
     const actualRestDays = Math.floor(
       (proposedEntryDate.getTime() - lastClosedMovement.exitDate.getTime()) /
       (1000 * 60 * 60 * 24)
     );
 
     if (actualRestDays < minRestDays) {
-      const daysShort = minRestDays - actualRestDays;
-      const recommendedDate = new Date(
-        lastClosedMovement.exitDate.getTime() + minRestDays * 86400000
+      throw new BadRequestException(
+        `El potrero necesita al menos ${minRestDays} días de descanso. ` +
+        `Última salida: ${lastClosedMovement.exitDate.toLocaleDateString('es-CO')}. ` +
+        `Descanso completado en: ${new Date(lastClosedMovement.exitDate.getTime() + minRestDays * 86400000).toLocaleDateString('es-CO')}`
       );
-
-      throw new BadRequestException({
-        message: `El potrero no ha descansado lo suficiente`,
-        details: {
-          minRestDaysRequired: minRestDays,
-          daysRested: actualRestDays,
-          daysShort,
-          lastExitDate: lastClosedMovement.exitDate.toISOString(),
-          recommendedEntryDate: recommendedDate.toISOString(),
-          advice: `El potrero necesita ${daysShort} días más de descanso. ` +
-                  `Entrada recomendada: ${recommendedDate.toLocaleDateString('es-CO')}`
-        }
-      });
     }
   }
 

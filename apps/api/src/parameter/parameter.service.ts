@@ -11,19 +11,8 @@ export class ParameterService {
 
   /**
    * Obtener valor de parámetro con fallback a default
-   * Busca primero en FarmParameter (override) y luego en Parameter (global)
    */
   async getParameter(farmId: string, key: string, defaultValue: string): Promise<string> {
-    // 1. Buscar en FarmParameter (override específico por finca)
-    const farmParam = await this.prisma.farmParameter.findUnique({
-      where: { farmId_key: { farmId, key } },
-    });
-
-    if (farmParam?.value) {
-      return farmParam.value;
-    }
-
-    // 2. Buscar en Parameter global
     const param = await this.prisma.parameter.findUnique({
       where: { farmId_key: { farmId, key } },
     });
@@ -113,53 +102,6 @@ export class ParameterService {
     }
 
     return toCreate.length;
-  }
-
-  /**
-   * Establecer parámetro override por finca (FarmParameter)
-   */
-  async setFarmParameter(
-    farmId: string,
-    key: string,
-    value: string,
-    userId: string,
-    description?: string
-  ) {
-    return this.prisma.farmParameter.upsert({
-      where: { farmId_key: { farmId, key } },
-      create: {
-        farmId,
-        key,
-        value,
-        description,
-        updatedBy: userId,
-      },
-      update: {
-        value,
-        description,
-        updatedBy: userId,
-      },
-    });
-  }
-
-  /**
-   * Obtener todos los parámetros de una finca (farm + global overrides)
-   */
-  async getFarmParameters(farmId: string) {
-    const farmParams = await this.prisma.farmParameter.findMany({
-      where: { farmId },
-    });
-
-    const globalParams = await this.prisma.parameter.findMany({
-      where: { farmId },
-    });
-
-    // Merge: farm overrides tienen prioridad
-    const result: Record<string, string> = {};
-    globalParams.forEach((p) => (result[p.key] = p.value));
-    farmParams.forEach((p) => (result[p.key] = p.value));
-
-    return result;
   }
 
   /**

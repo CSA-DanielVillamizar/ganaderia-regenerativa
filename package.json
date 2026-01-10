@@ -35,8 +35,5 @@
     "prettier": "^3.2.5",
     "turbo": "^1.12.4",
     "typescript": "^5.3.3"
-  },
-  "dependencies": {
-    "uuid": "^13.0.0"
   }
 }
