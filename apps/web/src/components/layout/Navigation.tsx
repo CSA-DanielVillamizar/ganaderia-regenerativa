@@ -4,13 +4,15 @@ import React from 'react';
 import Link from 'next/link';
 import { useLogout } from '@web/hooks/useAuth';
 import { Button } from '@web/components/common/Button';
-import { LogOut, Home, Leaf, Beef, BarChart3 } from 'lucide-react';
+import { LogOut, Home, Leaf, Beef, BarChart3, MoveRight, Grid3x3 } from 'lucide-react';
 import { FarmSwitcher } from './FarmSwitcher';
 
 const navItems = [
   { name: 'Dashboard', href: '/dashboard', icon: BarChart3 },
   { name: 'Fincas', href: '/farms', icon: Leaf },
+  { name: 'Potreros', href: '/paddocks', icon: Grid3x3 },
   { name: 'Lotes', href: '/herds', icon: Beef },
+  { name: 'Movimientos', href: '/dashboard/movements', icon: MoveRight },
 ];
 
 export function Sidebar() {

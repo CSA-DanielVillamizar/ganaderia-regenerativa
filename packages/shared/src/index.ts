@@ -61,7 +61,7 @@ export type AuthResponse = z.infer<typeof AuthResponseSchema>;
 export const CreateFarmDtoSchema = z.object({
   name: z.string().min(1, 'Nombre requerido'),
   location: z.string().optional(),
-  hectares: z.number().positive('Hectáreas debe ser positivo').optional(),
+  hectares: z.coerce.number().positive('Hectáreas debe ser positivo').optional(),
 });
 
 export type CreateFarmDto = z.infer<typeof CreateFarmDtoSchema>;
@@ -82,10 +82,10 @@ export type FarmResponse = z.infer<typeof FarmResponseSchema>;
 export const CreatePaddockDtoSchema = z.object({
   farmId: z.string(),
   name: z.string().min(1, 'Nombre requerido'),
-  hectares: z.number().positive('Hectáreas debe ser positivo'),
+  hectares: z.coerce.number().positive('Hectáreas debe ser positivo'),
   description: z.string().optional(),
   pastureType: z.string().optional(),
-  minRestDays: z.number().int().positive('Días de descanso debe ser positivo').optional(),
+  minRestDays: z.coerce.number().int().positive('Días de descanso debe ser positivo').optional(),
 });
 
 export type CreatePaddockDto = z.infer<typeof CreatePaddockDtoSchema>;
@@ -107,8 +107,8 @@ export type PaddockResponse = z.infer<typeof PaddockResponseSchema>;
 export const CreateHerdDtoSchema = z.object({
   farmId: z.string(),
   name: z.string().min(1, 'Nombre requerido'),
-  initialWeight: z.number().positive('Peso inicial debe ser positivo'),
-  animalCount: z.number().int().positive('Cantidad debe ser positivo'),
+  initialWeight: z.coerce.number().positive('Peso inicial debe ser positivo'),
+  animalCount: z.coerce.number().int().positive('Cantidad debe ser positivo'),
   description: z.string().optional(),
 });
 
@@ -132,15 +132,15 @@ export type HerdResponse = z.infer<typeof HerdResponseSchema>;
 
 export const CreateWeighingDtoSchema = z.object({
   herdId: z.string(),
-  weight: z.number().positive('Peso debe ser positivo'),
-  animalCount: z.number().int().positive('Cantidad debe ser positivo'),
+  weight: z.coerce.number().positive('Peso debe ser positivo'),
+  animalCount: z.coerce.number().int().positive('Cantidad debe ser positivo'),
   notes: z.string().optional(),
   method: z.nativeEnum(WeighingMethod).optional(),
-  chestGirthCm: z.number().positive('Perímetro torácico debe ser positivo').optional(),
-  bodyLengthCm: z.number().positive('Longitud corporal debe ser positivo').optional(),
-  estimatedWeightKg: z.number().positive().optional(),
-  realWeightKg: z.number().positive().optional(),
-  errorMarginPercent: z.number().min(0).max(100).optional(),
+  chestGirthCm: z.coerce.number().positive('Perímetro torácico debe ser positivo').optional(),
+  bodyLengthCm: z.coerce.number().positive('Longitud corporal debe ser positivo').optional(),
+  estimatedWeightKg: z.coerce.number().positive().optional(),
+  realWeightKg: z.coerce.number().positive().optional(),
+  errorMarginPercent: z.coerce.number().min(0).max(100).optional(),
 });
 
 export type CreateWeighingDto = z.infer<typeof CreateWeighingDtoSchema>;

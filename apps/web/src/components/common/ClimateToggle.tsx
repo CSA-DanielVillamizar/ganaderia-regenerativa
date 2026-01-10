@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Season } from '@shared/index';
 import { Cloud, Sun } from 'lucide-react';
+
+type Season = 'INVIERNO' | 'VERANO';
 
 interface ClimateToggleProps {
   onChange?: (season: Season) => void;
@@ -14,21 +15,21 @@ interface ClimateToggleProps {
  * Persiste la selección en localStorage y permite ajustar dinámicamente
  * los días de descanso según la temporada seleccionada.
  */
-export function ClimateToggle({ onChange, defaultSeason = Season.INVIERNO }: ClimateToggleProps) {
+export function ClimateToggle({ onChange, defaultSeason = 'INVIERNO' }: ClimateToggleProps) {
   const [season, setSeason] = useState<Season>(defaultSeason);
   const [isHydrated, setIsHydrated] = useState(false);
 
   // Cargar preferencia del localStorage al montar
   useEffect(() => {
     const savedSeason = localStorage.getItem('selectedSeason') as Season | null;
-    if (savedSeason && Object.values(Season).includes(savedSeason)) {
+    if (savedSeason && (savedSeason === 'INVIERNO' || savedSeason === 'VERANO')) {
       setSeason(savedSeason);
     }
     setIsHydrated(true);
   }, []);
 
   const handleToggle = () => {
-    const newSeason = season === Season.INVIERNO ? Season.VERANO : Season.INVIERNO;
+    const newSeason: Season = season === 'INVIERNO' ? 'VERANO' : 'INVIERNO';
     setSeason(newSeason);
     localStorage.setItem('selectedSeason', newSeason);
     onChange?.(newSeason);
@@ -36,7 +37,7 @@ export function ClimateToggle({ onChange, defaultSeason = Season.INVIERNO }: Cli
 
   if (!isHydrated) return null;
 
-  const isInvierno = season === Season.INVIERNO;
+  const isInvierno = season === 'INVIERNO';
   const seasonLabel = isInvierno ? 'Temporada de Lluvias' : 'Temporada Seca';
   const factorInfo = isInvierno ? '(Factor: 1.0x)' : '(Factor: 1.5x)';
 

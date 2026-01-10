@@ -25,7 +25,7 @@ export default function NewFarmPage() {
     try {
       setLoading(true);
       setError('');
-      await farmService.create({ ...data, hectares: data.hectares ? Number(data.hectares) : undefined });
+      await farmService.create(data);
       router.push('/farms');
     } catch (e: any) {
       setError(e.response?.data?.message || 'No se pudo crear la finca');
@@ -51,7 +51,7 @@ export default function NewFarmPage() {
           type="number"
           step="0.1"
           error={errors.hectares?.message as string}
-          {...register('hectares')}
+          {...register('hectares', { valueAsNumber: true })}
         />
 
         <div className="flex gap-3">

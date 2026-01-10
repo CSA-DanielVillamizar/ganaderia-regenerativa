@@ -32,10 +32,7 @@ export default function NewHerdPage() {
       setLoading(true);
       await herdService.create({
         farmId,
-        name: data.name,
-        description: data.description,
-        animalCount: Number(data.animalCount),
-        initialWeight: Number(data.initialWeight),
+        ...data,
       });
       router.push(`/farms/${farmId}`);
     } catch (e: any) {
@@ -61,14 +58,14 @@ export default function NewHerdPage() {
           label="Animales"
           type="number"
           error={errors.animalCount?.message as string}
-          {...register('animalCount')}
+          {...register('animalCount', { valueAsNumber: true })}
         />
         <Input
           label="Peso inicial (kg)"
           type="number"
           step="0.1"
           error={errors.initialWeight?.message as string}
-          {...register('initialWeight')}
+          {...register('initialWeight', { valueAsNumber: true })}
         />
 
         <div className="flex gap-3">

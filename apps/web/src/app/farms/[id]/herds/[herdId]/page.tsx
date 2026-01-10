@@ -32,7 +32,7 @@ export default function HerdDetailPage() {
 
   const movementsQuery = useQuery({
     queryKey: ['movements', herdId],
-    queryFn: () => movementService.getByHerd(herdId).then((res) => res.data),
+    queryFn: () => movementService.getByHerd(herdId).then((res) => res.data.data),
     enabled: !!herdId,
   });
 
@@ -89,17 +89,31 @@ export default function HerdDetailPage() {
     e.preventDefault();
     try {
       setFormError('');
-      await createMovement.mutateAsync({
+      
+      // Validar campos requeridos
+      if (!movementForm.paddockId) {
+        setFormError('Selecciona un potrero');
+        return;
+      }
+      if (!movementForm.entryDate) {
+        setFormError('Ingresa la fecha de entrada');
+        return;
+      }
+
+      const payload = {
         herdId,
         paddockId: movementForm.paddockId,
         type: 'ENTRY',
         entryDate: new Date(movementForm.entryDate).toISOString(),
         exitDate: movementForm.exitDate ? new Date(movementForm.exitDate).toISOString() : undefined,
         notes: 'Movimiento registrado desde web',
-      });
+      };
+
+      await createMovement.mutateAsync(payload);
       setMovementForm({ paddockId: '', entryDate: '', exitDate: '' });
     } catch (err: any) {
-      setFormError(err.response?.data?.message || 'Error al registrar movimiento');
+      console.error('Movement error:', err);
+      setFormError(err.response?.data?.message || err.message || 'Error al registrar movimiento');
     }
   };
 
@@ -222,38 +236,42 @@ export default function HerdDetailPage() {
 
         <div className="bg-white rounded-lg shadow p-5 space-y-4">
           <h3 className="text-lg font-semibold text-gray-900">Registrar movimiento</h3>
-          <form className="space-y-3" onSubmit={handleMovementSubmit}>
-            <label className="text-sm font-medium text-gray-700">Potrero</label>
-            <select
-              className="w-full border rounded-lg px-3 py-2 text-sm"
-              required
-              value={movementForm.paddockId}
-              onChange={(e) => setMovementForm((s) => ({ ...s, paddockId: e.target.value }))}
-            >
-              <option value="">Selecciona un potrero</option>
-              {paddocks.map((p: any) => (
-                <option key={p.id} value={p.id}>
-                  {p.name} - {p.hectares} ha
-                </option>
-              ))}
-            </select>
-            <Input
-              label="Fecha de entrada"
-              type="datetime-local"
-              required
-              value={movementForm.entryDate}
-              onChange={(e) => setMovementForm((s) => ({ ...s, entryDate: e.target.value }))}
-            />
-            <Input
-              label="Fecha de salida (opcional)"
-              type="datetime-local"
-              value={movementForm.exitDate}
-              onChange={(e) => setMovementForm((s) => ({ ...s, exitDate: e.target.value }))}
-            />
-            <Button type="submit" variant="secondary" loading={createMovement.isPending} className="w-full">
-              Guardar movimiento
-            </Button>
-          </form>
+          {paddocks.length === 0 ? (
+            <Alert type="warning" message="No hay potreros disponibles. Crea potreros primero." />
+          ) : (
+            <form className="space-y-3" onSubmit={handleMovementSubmit}>
+              <label className="text-sm font-medium text-gray-700">Potrero *</label>
+              <select
+                className="w-full border rounded-lg px-3 py-2 text-sm"
+                required
+                value={movementForm.paddockId}
+                onChange={(e) => setMovementForm((s) => ({ ...s, paddockId: e.target.value }))}
+              >
+                <option value="">Selecciona un potrero</option>
+                {paddocks.map((p: any) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name} - {p.hectares} ha
+                  </option>
+                ))}
+              </select>
+              <Input
+                label="Fecha de entrada *"
+                type="datetime-local"
+                required
+                value={movementForm.entryDate}
+                onChange={(e) => setMovementForm((s) => ({ ...s, entryDate: e.target.value }))}
+              />
+              <Input
+                label="Fecha de salida (opcional)"
+                type="datetime-local"
+                value={movementForm.exitDate}
+                onChange={(e) => setMovementForm((s) => ({ ...s, exitDate: e.target.value }))}
+              />
+              <Button type="submit" variant="secondary" loading={createMovement.isPending} className="w-full">
+                Guardar movimiento
+              </Button>
+            </form>
+          )}
         </div>
       </div>
     </div>
