@@ -1,0 +1,76 @@
+{
+  "name": "Ganadería Voisin - Rotación Regenerativa",
+  "short_name": "Ganadería",
+  "description": "Sistema de rotación regenerativa con principios Voisin para ganaderos",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#166534",
+  "orientation": "portrait",
+  "scope": "/",
+  "lang": "es-CO",
+  "dir": "ltr",
+  "categories": ["agriculture", "productivity", "business"],
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-apple-touch.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/dashboard-mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "/screenshots/dashboard-desktop.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Nuevo Movimiento",
+      "short_name": "Movimiento",
+      "description": "Registrar movimiento de lote",
+      "url": "/movements/new",
+      "icons": [
+        {
+          "src": "/icons/movement-96x96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Nuevo Aforo",
+      "short_name": "Aforo",
+      "description": "Registrar aforo forrajero",
+      "url": "/forage/new",
+      "icons": [
+        {
+          "src": "/icons/forage-96x96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
+}

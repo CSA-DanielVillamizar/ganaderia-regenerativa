@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Sidebar, BottomNav } from '@web/components/layout/Navigation';
 import { AuthGate } from '@web/components/layout/AuthGate';
 import { FarmProvider } from '@web/context/FarmContext';
+import InstallPrompt from '@web/components/pwa/InstallPrompt';
 import '@web/styles/globals.css';
 import { usePathname } from 'next/navigation';
 
@@ -35,6 +36,8 @@ export function RootLayoutClient({ children }: { children: React.ReactNode }) {
               </main>
               <BottomNav />
             </div>
+            {/* PWA Install Prompt */}
+            <InstallPrompt />
           </FarmProvider>
         )}
       </AuthGate>
