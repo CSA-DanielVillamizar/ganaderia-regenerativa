@@ -6,6 +6,7 @@ import { useLogout } from '@web/hooks/useAuth';
 import { Button } from '@web/components/common/Button';
 import { LogOut, Home, Leaf, Beef, BarChart3, MoveRight, Grid3x3 } from 'lucide-react';
 import { FarmSwitcher } from './FarmSwitcher';
+import { OfflineIndicator } from './OfflineIndicator';
 
 const navItems = [
   { name: 'Dashboard', href: '/dashboard', icon: BarChart3 },
@@ -25,6 +26,9 @@ export function Sidebar() {
         <p className="text-green-200 text-xs mt-1">Ganadería Regenerativa</p>
         <div className="mt-4">
           <FarmSwitcher />
+        </div>
+        <div className="mt-4 pt-4 border-t border-green-700">
+          <OfflineIndicator />
         </div>
       </div>
 
@@ -61,25 +65,30 @@ export function BottomNav() {
   const logout = useLogout();
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 lg:hidden flex justify-around">
-      {navItems.map((item) => {
-        const Icon = item.icon;
-        return (
-          <Link key={item.href} href={item.href}>
-            <div className="flex flex-col items-center text-xs text-gray-700 hover:text-green-600">
-              <Icon className="w-6 h-6 mb-1" />
-              {item.name}
-            </div>
-          </Link>
-        );
-      })}
-      <button
-        onClick={logout}
-        className="flex flex-col items-center text-xs text-gray-700 hover:text-green-600"
-      >
-        <LogOut className="w-6 h-6 mb-1" />
-        Salir
-      </button>
+    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 lg:hidden flex justify-between items-center">
+      <div className="flex justify-around flex-1">
+        {navItems.map((item) => {
+          const Icon = item.icon;
+          return (
+            <Link key={item.href} href={item.href}>
+              <div className="flex flex-col items-center text-xs text-gray-700 hover:text-green-600">
+                <Icon className="w-6 h-6 mb-1" />
+                {item.name}
+              </div>
+            </Link>
+          );
+        })}
+        <button
+          onClick={logout}
+          className="flex flex-col items-center text-xs text-gray-700 hover:text-green-600"
+        >
+          <LogOut className="w-6 h-6 mb-1" />
+          Salir
+        </button>
+      </div>
+      <div className="border-l border-gray-200 pl-3 ml-3">
+        <OfflineIndicator />
+      </div>
     </div>
   );
 }
