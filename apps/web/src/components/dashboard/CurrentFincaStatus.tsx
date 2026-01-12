@@ -5,7 +5,7 @@ import { AlertCircle, CheckCircle, Clock } from 'lucide-react';
 import { movementService } from '@web/services/api.service';
 import { notificationService } from '@web/services/notification.service';
 import { CardSkeleton, SkeletonLoader } from '@web/components/common/SkeletonLoader';
-import type { MovementResponse } from '@shared/index';
+import type { MovementResponse } from '@ganaderia/shared';
 
 interface CurrentStatus {
   herd: {
@@ -78,11 +78,7 @@ export function CurrentFincaStatus() {
       } catch (err: any) {
         const errorMsg = err.message || 'Error al cargar estado actual';
         setError(errorMsg);
-        notificationService.error(
-          errorMsg,
-          'Error en Dashboard',
-          err.traceId
-        );
+        notificationService.error(errorMsg, 'Error en Dashboard', err.traceId);
       } finally {
         setLoading(false);
       }
@@ -146,9 +142,7 @@ export function CurrentFincaStatus() {
  * Tarjeta individual de estado de lote
  */
 function StatusCard({ status }: { status: CurrentStatus }) {
-  const isRecovering = status.minRestDays
-    ? status.daysInPaddock >= status.minRestDays
-    : false;
+  const isRecovering = status.minRestDays ? status.daysInPaddock >= status.minRestDays : false;
 
   return (
     <div className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-6 border-l-4 border-green-500">

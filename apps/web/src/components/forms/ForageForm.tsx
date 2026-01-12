@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { CreateForageSampleDto, CreateForageSampleDtoSchema } from '@shared/index';
+import { CreateForageSampleDto, CreateForageSampleDtoSchema } from '@ganaderia/shared';
 import { forageService } from '@web/services/api.service';
 
 interface ForageFormProps {
@@ -14,13 +14,13 @@ interface ForageFormProps {
 
 /**
  * Formulario guiado de aforo forrajero
- * 
+ *
  * Flujo MVP (4 pasos):
  * 1. Área del marco de muestreo (m²)
  * 2. Peso fresco cortado (kg)
  * 3. % Materia Seca (MS)
  * 4. % Aprovechamiento esperado
- * 
+ *
  * → Cálculo automático de kg MS/ha disponible
  */
 export default function ForageForm({
@@ -32,16 +32,16 @@ export default function ForageForm({
 }: ForageFormProps) {
   // Paso 1: Área del marco
   const [frameAreaM2, setFrameAreaM2] = useState('1'); // Default 1m² (marco cuadrado común)
-  
+
   // Paso 2: Peso fresco
   const [freshWeightKg, setFreshWeightKg] = useState('');
-  
+
   // Paso 3: % Materia Seca
   const [dryMatterPercent, setDryMatterPercent] = useState('20'); // Default 20% típico
-  
+
   // Paso 4: % Aprovechamiento
   const [utilizationPercent, setUtilizationPercent] = useState('50'); // Default 50% conservador
-  
+
   const [sampleDate, setSampleDate] = useState(new Date().toISOString().split('T')[0]);
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
@@ -55,16 +55,16 @@ export default function ForageForm({
     if (frameAreaM2 && freshWeightKg && dryMatterPercent && utilizationPercent) {
       // 1. kg MS en la muestra
       const dryKg = parseFloat(freshWeightKg) * (parseFloat(dryMatterPercent) / 100);
-      
+
       // 2. kg MS por m²
       const dryKgPerM2 = dryKg / parseFloat(frameAreaM2);
-      
+
       // 3. kg MS por hectárea (10,000 m²)
       const kgMSPerHectare = dryKgPerM2 * 10000;
-      
+
       // 4. Aplicar % aprovechamiento
       const kgMSAvailable = kgMSPerHectare * (parseFloat(utilizationPercent) / 100);
-      
+
       setKgMSPerHa(Math.round(kgMSAvailable));
       setTotalAvailableKgMS(Math.round(kgMSAvailable * paddockHectares));
     } else {
@@ -283,16 +283,14 @@ export default function ForageForm({
         <div className="bg-gradient-to-r from-green-100 to-green-50 border-2 border-green-400 rounded-lg p-5">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <div className="text-sm text-green-700 font-medium mb-1">
-                Forraje Disponible
-              </div>
+              <div className="text-sm text-green-700 font-medium mb-1">Forraje Disponible</div>
               <div className="text-4xl font-bold text-green-900">
                 {kgMSPerHa.toLocaleString()} kg MS/ha
               </div>
             </div>
             <div className="text-5xl">🎯</div>
           </div>
-          
+
           <div className="grid grid-cols-2 gap-4 pt-4 border-t border-green-300">
             <div>
               <div className="text-xs text-green-600 mb-1">Total en Potrero</div>
@@ -313,9 +311,7 @@ export default function ForageForm({
 
       {/* Fecha de Muestreo */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Fecha del Muestreo
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Fecha del Muestreo</label>
         <input
           type="date"
           value={sampleDate}

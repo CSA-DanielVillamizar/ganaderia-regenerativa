@@ -1,0 +1,88 @@
+diff --git a/apps/web/package.json b/apps/web/package.json
+index efb24e5..e1c15c1 100644
+--- a/apps/web/package.json
++++ b/apps/web/package.json
+@@ -22,12 +22,12 @@
+     "@radix-ui/react-slot": "1.0.2",
+     "@tanstack/react-query": "5.28.0",
+     "@tanstack/react-query-devtools": "5.28.0",
+-    "axios": "1.6.5",
++    "axios": "^1.13.2",
+     "clsx": "2.0.0",
+     "jspdf": "^2.5.1",
+     "jspdf-autotable": "^3.5.31",
+     "lucide-react": "0.371.0",
+-    "next": "14.2.0",
++    "next": "14.2.35",
+     "react": "18.2.0",
+     "react-dom": "18.2.0",
+     "react-hook-form": "7.50.1",
+@@ -55,6 +55,6 @@
+     "prettier": "3.1.1",
+     "tailwindcss": "3.4.1",
+     "typescript": "5.3.3",
+-    "vitest": "1.1.0"
++    "vitest": "^1.6.1"
+   }
+ }
+
+diff --git a/apps/web/src/app/farms/[id]/decision-today/page.tsx b/apps/web/src/app/farms/[id]/decision-today/page.tsx
+index a58320c..5f9aa05 100644
+--- a/apps/web/src/app/farms/[id]/decision-today/page.tsx
++++ b/apps/web/src/app/farms/[id]/decision-today/page.tsx
+@@ -2,7 +2,7 @@
+ 
+ import { useEffect, useMemo, useState } from "react";
+ import { useRouter, useSearchParams } from "next/navigation";
+-import { DecisionTodayResponse, DecisionTodayResponseSchema } from "@shared/index";
++import { DecisionTodayResponse, DecisionTodayResponseSchema } from "@ganaderia/shared";
+ 
+ /**
+  * Página "Decision Today": Orquesta acciones diarias a partir del dashboard.
+
+diff --git a/apps/web/tsconfig.json b/apps/web/tsconfig.json
+index eda29b4..cc03ecd 100644
+--- a/apps/web/tsconfig.json
++++ b/apps/web/tsconfig.json
+@@ -24,6 +24,9 @@
+       "@/*": [
+         "src/*"
+       ],
++      "@shared": [
++        "../../packages/shared/src/index.ts"
++      ],
+       "@shared/*": [
+         "../../packages/shared/src/*"
+       ]
+
+diff --git a/packages/shared/package.json b/packages/shared/package.json
+index 531593e..89ee326 100644
+--- a/packages/shared/package.json
++++ b/packages/shared/package.json
+@@ -5,6 +5,12 @@
+   "private": true,
+   "main": "./dist/index.js",
+   "types": "./dist/index.d.ts",
++  "exports": {
++    ".": {
++      "types": "./dist/index.d.ts",
++      "default": "./dist/index.js"
++    }
++  },
+   "scripts": {
+     "build": "tsc",
+     "dev": "tsc --watch",
+
+diff --git a/tsconfig.json b/tsconfig.json
+index 9fac26f..b6dded4 100644
+--- a/tsconfig.json
++++ b/tsconfig.json
+@@ -15,6 +15,8 @@
+     "sourceMap": true,
+     "baseUrl": ".",
+     "paths": {
++      "@ganaderia/shared": ["packages/shared/dist/index.d.ts"],
++      "@shared": ["packages/shared/src/index.ts"],
+       "@shared/*": ["packages/shared/src/*"],
+       "@api/*": ["apps/api/src/*"],
+       "@web/*": ["apps/web/src/*"]

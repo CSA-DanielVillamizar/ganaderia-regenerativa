@@ -1,5 +1,14 @@
 import apiClient from '@web/lib/api-client';
-import { CreateFarmDto, CreatePaddockDto, CreateHerdDto, CreateWeighingDto, CreateMovementDto, CreateForageSampleDto, ListMovementsResponse, MovementResponse } from '@shared/index';
+import {
+  CreateFarmDto,
+  CreatePaddockDto,
+  CreateHerdDto,
+  CreateWeighingDto,
+  CreateMovementDto,
+  CreateForageSampleDto,
+  ListMovementsResponse,
+  MovementResponse,
+} from '@ganaderia/shared';
 
 /**
  * Servicio para Fincas

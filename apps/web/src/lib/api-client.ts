@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, AxiosError, AxiosResponse } from 'axios';
 import { API_URL } from './api-config';
-import { ErrorResponse } from '@shared/index';
+import { ErrorResponse } from '@ganaderia/shared';
 
 let token: string | null = null;
 
@@ -131,7 +131,10 @@ apiClient.interceptors.response.use(
     const normalizedError = normalizeError(error);
 
     // Llamar callback de notificación si está registrado
-    if (errorNotificationCallback && (error.response?.status === 400 || error.response?.status === 409)) {
+    if (
+      errorNotificationCallback &&
+      (error.response?.status === 400 || error.response?.status === 409)
+    ) {
       errorNotificationCallback(normalizedError);
     }
 

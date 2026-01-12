@@ -1,5 +1,5 @@
 import apiClient, { setToken, clearToken } from '@web/lib/api-client';
-import { LoginDto, AuthResponse } from '@shared/index';
+import { LoginDto, AuthResponse } from '@ganaderia/shared';
 
 /**
  * Servicio de autenticación

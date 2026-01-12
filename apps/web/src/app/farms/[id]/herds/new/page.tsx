@@ -4,7 +4,7 @@ import React from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { CreateHerdDtoSchema } from '@shared/index';
+import { CreateHerdDtoSchema } from '@ganaderia/shared';
 import { herdService } from '@web/services/api.service';
 import { Input } from '@web/components/common/Input';
 import { Button } from '@web/components/common/Button';
@@ -52,7 +52,12 @@ export default function NewHerdPage() {
       {error && <Alert type="error" message={error} />}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 bg-white p-6 rounded-lg shadow">
-        <Input label="Nombre" required error={errors.name?.message as string} {...register('name')} />
+        <Input
+          label="Nombre"
+          required
+          error={errors.name?.message as string}
+          {...register('name')}
+        />
         <Input label="Descripción" {...register('description')} />
         <Input
           label="Animales"

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { CreateWeighingDto, CreateWeighingDtoSchema } from '@shared/index';
+import { CreateWeighingDto, CreateWeighingDtoSchema } from '@ganaderia/shared';
 import { weighingService } from '@web/services/api.service';
 
 interface WeighingFormProps {
@@ -24,19 +24,19 @@ interface WeighingFormProps {
 
 /**
  * Formulario de pesaje con soporte para báscula y cinta métrica
- * 
+ *
  * Características MVP:
  * - Método: Báscula (peso directo) o Cinta (estimación)
  * - Cinta: perímetro torácico + longitud corporal → estimación automática
  * - Validación con Zod antes de enviar
  * - Cálculo automático de peso promedio por animal
  */
-export default function WeighingForm({ 
-  herdId, 
-  herdName, 
+export default function WeighingForm({
+  herdId,
+  herdName,
   animalCount,
-  onSuccess, 
-  onCancel 
+  onSuccess,
+  onCancel,
 }: WeighingFormProps) {
   const [method, setMethod] = useState<WeighingMethod>('SCALE');
   const [weight, setWeight] = useState('');
@@ -80,9 +80,7 @@ export default function WeighingForm({
     try {
       const dto: CreateWeighingDto = {
         herdId,
-        weight: method === 'SCALE' 
-          ? parseFloat(weight) 
-          : estimatedWeight || 0,
+        weight: method === 'SCALE' ? parseFloat(weight) : estimatedWeight || 0,
         animalCount: parseInt(animalCountInput),
         notes: notes || undefined,
         method,
@@ -107,11 +105,12 @@ export default function WeighingForm({
     }
   };
 
-  const weightPerAnimal = method === 'SCALE' && weight
-    ? (parseFloat(weight) / parseInt(animalCountInput)).toFixed(1)
-    : estimatedWeight 
-    ? (estimatedWeight / parseInt(animalCountInput)).toFixed(1)
-    : '0';
+  const weightPerAnimal =
+    method === 'SCALE' && weight
+      ? (parseFloat(weight) / parseInt(animalCountInput)).toFixed(1)
+      : estimatedWeight
+        ? (estimatedWeight / parseInt(animalCountInput)).toFixed(1)
+        : '0';
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -124,9 +123,7 @@ export default function WeighingForm({
 
       {/* Selector de Método */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Método de Pesaje
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Método de Pesaje</label>
         <div className="grid grid-cols-2 gap-3">
           <button
             type="button"
@@ -228,14 +225,13 @@ export default function WeighingForm({
                   <div className="text-sm text-green-700 font-medium mb-1">
                     Peso Estimado por Animal
                   </div>
-                  <div className="text-3xl font-bold text-green-900">
-                    {estimatedWeight} kg
-                  </div>
+                  <div className="text-3xl font-bold text-green-900">{estimatedWeight} kg</div>
                 </div>
                 <div className="text-4xl">🎯</div>
               </div>
               <div className="mt-2 text-xs text-green-600">
-                Peso total del lote: {(estimatedWeight * parseInt(animalCountInput || '1')).toFixed(0)} kg
+                Peso total del lote:{' '}
+                {(estimatedWeight * parseInt(animalCountInput || '1')).toFixed(0)} kg
               </div>
             </div>
           )}
@@ -265,9 +261,7 @@ export default function WeighingForm({
 
       {/* Notas */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Notas (opcional)
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Notas (opcional)</label>
         <textarea
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
@@ -287,7 +281,9 @@ export default function WeighingForm({
       <div className="flex gap-3 pt-4">
         <button
           type="submit"
-          disabled={loading || (method === 'SCALE' && !weight) || (method === 'TAPE' && !estimatedWeight)}
+          disabled={
+            loading || (method === 'SCALE' && !weight) || (method === 'TAPE' && !estimatedWeight)
+          }
           className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
           {loading ? 'Guardando...' : 'Guardar Pesaje'}

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { AlertTriangle, TrendingUp, AlertCircle, CheckCircle2 } from 'lucide-react';
-import { OvergrazingAlert } from '@shared/index';
+import { OvergrazingAlert } from '@ganaderia/shared';
 import { SkeletonLoader } from '../common/SkeletonLoader';
 import { notificationService } from '@web/services/notification.service';
 
@@ -48,8 +48,7 @@ export function FincaDashboard() {
         // Calcular métricas basadas en alertas
         const criticalCount = alertsData.criticalAlerts || 0;
         const highCount = alertsData.highAlerts || 0;
-        const overallHealth =
-          criticalCount > 0 ? 'CRITICAL' : highCount > 0 ? 'CAUTION' : 'GOOD';
+        const overallHealth = criticalCount > 0 ? 'CRITICAL' : highCount > 0 ? 'CAUTION' : 'GOOD';
 
         setMetrics({
           totalActiveHerds: alertsData.data?.length || 0,
@@ -60,10 +59,7 @@ export function FincaDashboard() {
       }
     } catch (error) {
       const traceId = Math.random().toString(36).substring(7);
-      notificationService.error(
-        'Error al cargar dashboard',
-        traceId
-      );
+      notificationService.error('Error al cargar dashboard', traceId);
       console.error('Dashboard error:', error);
     } finally {
       setLoading(false);
@@ -144,13 +140,18 @@ export function FincaDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Alertas Activas</p>
-              <p className={`text-3xl font-bold mt-2 ${
-                alerts.length > 0 ? 'text-red-600' : 'text-green-600'
-              }`}>
+              <p
+                className={`text-3xl font-bold mt-2 ${
+                  alerts.length > 0 ? 'text-red-600' : 'text-green-600'
+                }`}
+              >
                 {alerts.length}
               </p>
             </div>
-            <AlertTriangle className={alerts.length > 0 ? 'text-red-500' : 'text-green-500'} size={32} />
+            <AlertTriangle
+              className={alerts.length > 0 ? 'text-red-500' : 'text-green-500'}
+              size={32}
+            />
           </div>
           <p className="text-xs text-gray-500 mt-4">De sobrepastoreo</p>
         </div>
@@ -175,21 +176,19 @@ export function FincaDashboard() {
         <div className="bg-red-50 border border-red-200 rounded-lg p-6">
           <div className="flex items-center gap-3 mb-4">
             <AlertTriangle className="text-red-600" size={24} />
-            <h3 className="text-lg font-semibold text-red-900">
-              Alertas de Sobrepastoreo
-            </h3>
+            <h3 className="text-lg font-semibold text-red-900">Alertas de Sobrepastoreo</h3>
           </div>
 
           <div className="space-y-3">
-            {alerts.map(alert => (
+            {alerts.map((alert) => (
               <div
                 key={alert.id}
                 className={`p-4 rounded-lg ${
                   alert.severity === 'CRITICAL'
                     ? 'bg-red-100 border border-red-300'
                     : alert.severity === 'HIGH'
-                    ? 'bg-orange-100 border border-orange-300'
-                    : 'bg-yellow-100 border border-yellow-300'
+                      ? 'bg-orange-100 border border-orange-300'
+                      : 'bg-yellow-100 border border-yellow-300'
                 }`}
               >
                 <div className="flex items-center justify-between">
@@ -198,25 +197,26 @@ export function FincaDashboard() {
                       {alert.herdName} → {alert.paddockName}
                     </p>
                     <p className="text-sm text-gray-700 mt-1">
-                      Llevar <strong>{alert.daysOccupied} días</strong> (Máximo: {alert.maxAllowedDays} días)
+                      Llevar <strong>{alert.daysOccupied} días</strong> (Máximo:{' '}
+                      {alert.maxAllowedDays} días)
                     </p>
                     <p className="text-xs text-gray-600 mt-1">
                       Entrada: {new Date(alert.entryDate).toLocaleDateString('es-MX')}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className={`text-xl font-bold ${
-                      alert.severity === 'CRITICAL'
-                        ? 'text-red-600'
-                        : alert.severity === 'HIGH'
-                        ? 'text-orange-600'
-                        : 'text-yellow-600'
-                    }`}>
+                    <p
+                      className={`text-xl font-bold ${
+                        alert.severity === 'CRITICAL'
+                          ? 'text-red-600'
+                          : alert.severity === 'HIGH'
+                            ? 'text-orange-600'
+                            : 'text-yellow-600'
+                      }`}
+                    >
                       +{alert.exceedDays}d
                     </p>
-                    <p className="text-xs text-gray-600">
-                      Severidad: {alert.severity}
-                    </p>
+                    <p className="text-xs text-gray-600">Severidad: {alert.severity}</p>
                   </div>
                 </div>
 
@@ -254,12 +254,12 @@ export function FincaDashboard() {
 function openWhatsAppAlert(alert: OvergrazingAlert) {
   const message = encodeURIComponent(
     `⚠️ ALERTA DE SOBREPASTOREO\n\n` +
-    `Lote: ${alert.herdName}\n` +
-    `Potrero: ${alert.paddockName}\n` +
-    `Días de ocupación: ${alert.daysOccupied} (Máximo: ${alert.maxAllowedDays})\n` +
-    `Exceso: +${alert.exceedDays} días\n` +
-    `Severidad: ${alert.severity}\n\n` +
-    `🚨 Se recomienda rotación inmediata`
+      `Lote: ${alert.herdName}\n` +
+      `Potrero: ${alert.paddockName}\n` +
+      `Días de ocupación: ${alert.daysOccupied} (Máximo: ${alert.maxAllowedDays})\n` +
+      `Exceso: +${alert.exceedDays} días\n` +
+      `Severidad: ${alert.severity}\n\n` +
+      `🚨 Se recomienda rotación inmediata`
   );
 
   // Abre WhatsApp Web (sin número específico, el usuario puede seleccionar)

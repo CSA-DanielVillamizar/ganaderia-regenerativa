@@ -1,4 +1,4 @@
-import { ErrorResponse } from '@shared/index';
+import { ErrorResponse } from '@ganaderia/shared';
 import { registerErrorNotificationCallback } from '@web/lib/api-client';
 
 /**
@@ -56,7 +56,7 @@ class NotificationService {
    * Notificar a todos los listeners con lista actual
    */
   private notifyListeners() {
-    this.listeners.forEach(listener => listener([...this.notifications]));
+    this.listeners.forEach((listener) => listener([...this.notifications]));
   }
 
   /**
@@ -119,9 +119,7 @@ class NotificationService {
    * @param traceId - ID de rastreo desde el servidor (opcional)
    */
   error(message: string, title: string = 'Error', traceId?: string) {
-    const fullMessage = traceId
-      ? `${message}\n\nCódigo de rastreo: ${traceId}`
-      : message;
+    const fullMessage = traceId ? `${message}\n\nCódigo de rastreo: ${traceId}` : message;
 
     return this.createNotification('error', title, fullMessage, {
       traceId,
@@ -156,7 +154,7 @@ class NotificationService {
    * Remover notificación por ID
    */
   removeNotification(id: string) {
-    const idx = this.notifications.findIndex(n => n.id === id);
+    const idx = this.notifications.findIndex((n) => n.id === id);
     if (idx >= 0) {
       this.notifications.splice(idx, 1);
       this.notifyListeners();

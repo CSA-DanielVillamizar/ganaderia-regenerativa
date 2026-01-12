@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { LoginDtoSchema, LoginDto } from '@shared/index';
+import { LoginDtoSchema, LoginDto } from '@ganaderia/shared';
 import { Input } from '@web/components/common/Input';
 import { Button } from '@web/components/common/Button';
 import { Alert } from '@web/components/common/Alert';

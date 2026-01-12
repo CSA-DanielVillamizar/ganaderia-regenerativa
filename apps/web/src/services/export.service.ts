@@ -1,7 +1,7 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
-import { Movement } from '@shared/index';
+import { Movement } from '@ganaderia/shared';
 
 interface MovementExportData {
   id: string;
@@ -51,7 +51,7 @@ export class ExportService {
 
     // Información de filtros si existen
     let yPosition = margin + 30;
-    if (filters && Object.values(filters).some(v => v)) {
+    if (filters && Object.values(filters).some((v) => v)) {
       doc.setFontSize(9);
       doc.setTextColor(60, 60, 60);
       doc.text('Filtros aplicados:', margin, yPosition);
@@ -68,7 +68,7 @@ export class ExportService {
     }
 
     // Tabla de datos
-    const tableData = movements.map(m => [
+    const tableData = movements.map((m) => [
       m.herdName,
       m.paddockName,
       m.entryDate,
@@ -135,10 +135,12 @@ export class ExportService {
     const exportData = [
       ['Reporte de Movimientos - Ganadería Regenerativa'],
       [farmName ? `Finca: ${farmName}` : ''],
-      [`Generado: ${new Date().toLocaleDateString('es-MX')} ${new Date().toLocaleTimeString('es-MX')}`],
+      [
+        `Generado: ${new Date().toLocaleDateString('es-MX')} ${new Date().toLocaleTimeString('es-MX')}`,
+      ],
       [],
       ['Lote', 'Potrero', 'Entrada', 'Salida', 'Duración (días)', 'Estado', 'Ref.'],
-      ...movements.map(m => [
+      ...movements.map((m) => [
         m.herdName,
         m.paddockName,
         m.entryDate,
@@ -190,10 +192,8 @@ export class ExportService {
    * @param movements Array de movimientos de la API
    * @returns Array de movimientos formateado para exportación
    */
-  static formatMovementsForExport(
-    movements: any[]
-  ): MovementExportData[] {
-    return movements.map(m => ({
+  static formatMovementsForExport(movements: any[]): MovementExportData[] {
+    return movements.map((m) => ({
       id: m.id,
       herdName: m.herd?.name || 'Sin información',
       paddockName: m.paddock?.name || 'Sin información',

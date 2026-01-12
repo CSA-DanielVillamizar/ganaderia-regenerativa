@@ -6,7 +6,7 @@ import { movementService } from '@web/services/api.service';
 import { notificationService } from '@web/services/notification.service';
 import { SkeletonLoader } from '@web/components/common/SkeletonLoader';
 import { ExportService } from '@web/services/export.service';
-import type { MovementResponse } from '@shared/index';
+import type { MovementResponse } from '@ganaderia/shared';
 
 interface MovementHistoryTableProps {
   herdId?: string;
@@ -18,11 +18,7 @@ interface MovementHistoryTableProps {
  * Tabla de Historial de Movimientos
  * Muestra registro de todos los movimientos con paginación y filtros
  */
-export function MovementHistoryTable({
-  herdId,
-  paddockId,
-  limit = 10,
-}: MovementHistoryTableProps) {
+export function MovementHistoryTable({ herdId, paddockId, limit = 10 }: MovementHistoryTableProps) {
   const [movements, setMovements] = useState<MovementResponse[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(limit);
@@ -55,11 +51,7 @@ export function MovementHistoryTable({
       } catch (err: any) {
         const errorMsg = err.message || 'Error al cargar historial';
         setError(errorMsg);
-        notificationService.error(
-          errorMsg,
-          'Error en Historial',
-          err.traceId
-        );
+        notificationService.error(errorMsg, 'Error en Historial', err.traceId);
       } finally {
         setLoading(false);
       }
@@ -88,25 +80,21 @@ export function MovementHistoryTable({
   const handleExport = async (format: 'pdf' | 'excel') => {
     try {
       setExporting(true);
-      
+
       if (!movements.length) {
         notificationService.warning('No hay movimientos para exportar');
         return;
       }
 
       const formattedData = ExportService.formatMovementsForExport(movements);
-      
+
       if (format === 'pdf') {
-        ExportService.exportMovementsAsPDF(
-          formattedData,
-          'Reporte_Movimientos',
-          { herdId, paddockId }
-        );
+        ExportService.exportMovementsAsPDF(formattedData, 'Reporte_Movimientos', {
+          herdId,
+          paddockId,
+        });
       } else {
-        ExportService.exportMovementsAsExcel(
-          formattedData,
-          'Reporte_Movimientos'
-        );
+        ExportService.exportMovementsAsExcel(formattedData, 'Reporte_Movimientos');
       }
 
       notificationService.success(`Reporte ${format.toUpperCase()} generado exitosamente`);
@@ -142,7 +130,7 @@ export function MovementHistoryTable({
       <div className="p-6 border-b border-gray-200">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <h2 className="text-xl font-bold text-gray-800">Historial de Movimientos</h2>
-          
+
           <div className="flex items-center gap-3">
             {/* Export Buttons */}
             <div className="flex gap-2">
@@ -288,9 +276,7 @@ function MovementRow({ movement }: { movement: MovementResponse }) {
       <td className="px-6 py-4">
         <span
           className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-            isActive
-              ? 'bg-green-100 text-green-800'
-              : 'bg-gray-100 text-gray-800'
+            isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
           }`}
         >
           {isActive ? '🟢 Activo' : '⚫ Completado'}
