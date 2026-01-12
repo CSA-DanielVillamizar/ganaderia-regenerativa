@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { FormField, DatePicker, NumberInput, Select, FormActions } from '@/components/forms';
 import {
   createWeighing,
@@ -66,6 +66,11 @@ export default function WeighingNewPage({ params }: PageProps) {
     loadHerds();
   }, [params.id]);
 
+  // Invalid herdId from query
+  const herdIdIsInvalid = useMemo(() => {
+    return Boolean(herdIdParam) && herds.length > 0 && !herds.find(h => h.id === herdIdParam);
+  }, [herdIdParam, herds]);
+
   // Recalcular automáticamente
   useEffect(() => {
     if (typeof numberOfAnimals === 'number' && typeof totalWeightKg === 'number') {
@@ -97,15 +102,8 @@ export default function WeighingNewPage({ params }: PageProps) {
         ? `${response.gainSinceLastWeighing > 0 ? '+' : ''}${response.gainSinceLastWeighing.toFixed(1)} kg`
         : 'primer pesaje';
 
-      localStorage.setItem(
-        'toast',
-        JSON.stringify({
-          type: 'success',
-          message: `✅ Pesaje registrado - Ganancia: ${gain}`,
-        })
-      );
-
-      router.push(`/farms/${params.id}/decision-today`);
+      const message = encodeURIComponent(`✅ Pesaje registrado - Ganancia: ${gain}`);
+      router.push(`/farms/${params.id}/decision-today?status=success&toast=${message}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al guardar');
     } finally {
@@ -132,9 +130,20 @@ export default function WeighingNewPage({ params }: PageProps) {
         <h1 className="text-2xl font-bold text-gray-800">⚖️ Registrar Pesaje</h1>
         <p className="text-sm text-gray-600">Control de ganancia de peso</p>
 
-        {error && (
-          <div className="bg-red-100 text-red-700 px-4 py-2 rounded text-sm">
+        {(error || herdIdIsInvalid) && (
+          <div className="bg-red-100 text-red-700 px-4 py-2 rounded text-sm space-y-2">
             {error}
+            {herdIdIsInvalid && (
+              <div className="flex items-center justify-between">
+                <span>ID de lote inválido en el contexto</span>
+                <button
+                  className="px-2 py-1 text-xs bg-gray-200 hover:bg-gray-300 rounded"
+                  onClick={() => setHerdId('')}
+                >
+                  Limpiar selección
+                </button>
+              </div>
+            )}
           </div>
         )}
 

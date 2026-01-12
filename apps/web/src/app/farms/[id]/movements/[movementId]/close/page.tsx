@@ -74,7 +74,7 @@ export default function MovementClosePage({ params }: PageProps) {
     setError(null);
 
     try {
-      const response = await closeMovement(params.movementId, {
+      await closeMovement(params.movementId, {
         exitDate,
         notes: notes || undefined,
       });
@@ -84,15 +84,8 @@ export default function MovementClosePage({ params }: PageProps) {
         exitDate
       );
 
-      localStorage.setItem(
-        'toast',
-        JSON.stringify({
-          type: 'success',
-          message: `✅ Movimiento cerrado - Ocupación: ${occupancy} días`,
-        })
-      );
-
-      router.push(`/farms/${params.id}/decision-today`);
+      const message = encodeURIComponent(`✅ Movimiento cerrado - Ocupación: ${occupancy} días`);
+      router.push(`/farms/${params.id}/decision-today?status=success&toast=${message}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al guardar');
     } finally {
@@ -111,7 +104,23 @@ export default function MovementClosePage({ params }: PageProps) {
   if (!movement) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <p className="text-red-600">Movimiento no encontrado</p>
+        <div className="bg-red-100 text-red-700 px-4 py-2 rounded text-sm space-y-3">
+          <p>Movimiento no encontrado</p>
+          <div className="flex items-center gap-2">
+            <button
+              className="px-3 py-2 bg-gray-200 hover:bg-gray-300 rounded"
+              onClick={() => router.push(`/farms/${params.id}/movements/new`)}
+            >
+              Registrar Movimiento
+            </button>
+            <button
+              className="px-3 py-2 bg-white border hover:bg-gray-50 rounded"
+              onClick={() => router.push(`/farms/${params.id}/decision-today`)}
+            >
+              Volver a Decision Today
+            </button>
+          </div>
+        </div>
       </div>
     );
   }

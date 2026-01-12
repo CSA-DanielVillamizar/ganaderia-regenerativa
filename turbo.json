@@ -1,25 +1,69 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "pipeline": {
+  "globalEnv": [],
+  "tasks": {
     "dev": {
       "cache": false,
-      "persistent": true
+      "persistent": true,
+      "interactive": true,
+      "dependsOn": []
     },
     "build": {
       "outputs": ["dist/**", ".next/**", "build/**"],
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build"],
+      "cache": true
     },
     "test": {
-      "outputs": ["coverage/**"]
+      "cache": false,
+      "dependsOn": ["build"]
+    },
+    "test:unit": {
+      "cache": false
+    },
+    "test:api": {
+      "cache": false
+    },
+    "test:all": {
+      "cache": false,
+      "dependsOn": ["build"]
+    },
+    "test:watch": {
+      "cache": false,
+      "persistent": true,
+      "interactive": true,
+      "dependsOn": []
+    },
+    "test:cov": {
+      "cache": false
     },
     "lint": {
-      "outputs": []
+      "outputs": [],
+      "cache": true
     },
     "format": {
-      "outputs": []
+      "outputs": [],
+      "cache": true
     },
     "format:fix": {
-      "outputs": []
+      "outputs": [],
+      "cache": true
+    },
+    "db:push": {
+      "cache": false,
+      "persistent": false
+    },
+    "db:migrate": {
+      "cache": false,
+      "persistent": false
+    },
+    "db:seed": {
+      "cache": false,
+      "persistent": false
+    },
+    "db:studio": {
+      "cache": false,
+      "persistent": true,
+      "interactive": true
     }
   }
 }

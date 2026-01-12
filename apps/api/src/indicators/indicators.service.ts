@@ -317,7 +317,7 @@ export class IndicatorsService {
       },
     });
 
-    return paddocks.map((paddock) => {
+    return paddocks.map((paddock: any) => {
       const lastMovement = paddock.movements[0];
       let currentState: 'READY' | 'OCCUPIED' | 'RESTING' | 'RECOVERING' = 'READY';
       let daysInState = 0;

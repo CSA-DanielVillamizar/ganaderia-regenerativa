@@ -263,6 +263,29 @@ export const DashboardTrendSchema = z.object({
 
 export type DashboardTrend = z.infer<typeof DashboardTrendSchema>;
 
+// ============= DTOs - Decision Today =============
+
+export const DecisionTodayActionItemSchema = z.object({
+  id: z.string().optional(),
+  label: z.string(),
+  done: z.boolean().optional(),
+});
+
+export type DecisionTodayActionItem = z.infer<typeof DecisionTodayActionItemSchema>;
+
+export const DecisionTodayResponseSchema = z.object({
+  farmId: z.string(),
+  confidenceLevel: z.enum(['HIGH', 'MEDIUM', 'LOW']).optional(),
+  confidenceScore: z.number().min(0).max(100).optional(),
+  explainability: z.string().optional(),
+  actionChecklist: z.array(DecisionTodayActionItemSchema).optional(),
+  recommendedHerdId: z.string().nullable().optional(),
+  recommendedPaddockId: z.string().nullable().optional(),
+  activeMovementId: z.string().nullable().optional(),
+});
+
+export type DecisionTodayResponse = z.infer<typeof DecisionTodayResponseSchema>;
+
 // ============= Contratos Globales =============
 
 /**

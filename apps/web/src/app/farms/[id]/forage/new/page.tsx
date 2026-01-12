@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { FormField, DatePicker, NumberInput, Select, FormActions } from '@/components/forms';
 import {
   createForage,
@@ -67,6 +67,11 @@ export default function ForageNewPage({ params }: PageProps) {
     loadPaddocks();
   }, [params.id]);
 
+  // Advertir ID inválido del query
+  const paddockIdIsInvalid = useMemo(() => {
+    return Boolean(paddockIdParam) && paddocks.length > 0 && !paddocks.find(p => p.id === paddockIdParam);
+  }, [paddockIdParam, paddocks]);
+
   // Recalcular kg/ha cuando cambien valores
   useEffect(() => {
     if (
@@ -98,17 +103,10 @@ export default function ForageNewPage({ params }: PageProps) {
         drymatterPercent: drymatterPercent as number,
       });
 
-      // Toast de éxito
-      localStorage.setItem(
-        'toast',
-        JSON.stringify({
-          type: 'success',
-          message: `✅ Aforo registrado: ${response.kgPerHectare.toFixed(0)} kg/ha (${response.category})`,
-        })
+      const message = encodeURIComponent(
+        `✅ Aforo registrado: ${response.kgPerHectare.toFixed(0)} kg/ha (${response.category})`
       );
-
-      // Retornar a Decision Today
-      router.push(`/farms/${params.id}/decision-today`);
+      router.push(`/farms/${params.id}/decision-today?status=success&toast=${message}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al guardar');
     } finally {
@@ -137,9 +135,20 @@ export default function ForageNewPage({ params }: PageProps) {
           Marco cuadrado - Registro de biomasa disponible
         </p>
 
-        {error && (
-          <div className="bg-red-100 text-red-700 px-4 py-2 rounded text-sm">
+        {(error || paddockIdIsInvalid) && (
+          <div className="bg-red-100 text-red-700 px-4 py-2 rounded text-sm space-y-2">
             {error}
+            {paddockIdIsInvalid && (
+              <div className="flex items-center justify-between">
+                <span>ID de potrero inválido en el contexto</span>
+                <button
+                  className="px-2 py-1 text-xs bg-gray-200 hover:bg-gray-300 rounded"
+                  onClick={() => setPaddockId('')}
+                >
+                  Limpiar selección
+                </button>
+              </div>
+            )}
           </div>
         )}
 

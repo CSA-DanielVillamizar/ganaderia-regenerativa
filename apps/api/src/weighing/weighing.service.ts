@@ -92,7 +92,7 @@ export class WeighingService {
       take: 50,
     });
 
-    return weighings.map((w) => ({
+    return weighings.map((w: any) => ({
       date: w.recordedAt,
       weight: w.weight,
       ua: w.weight / 450,

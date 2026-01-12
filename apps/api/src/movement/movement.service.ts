@@ -48,10 +48,11 @@ export class MovementService {
     const farm = await this.prisma.farm.findUniqueOrThrow({
       where: { id: paddock.farmId },
     });
+    // P0.5: Obtener parámetro de descanso mínimo usando clave estandarizada
     const minRestDaysParam = await this.prisma.parameter.findFirst({
       where: {
         farmId: farm.id,
-        key: 'minRestDays',
+        key: 'min_rest_days',
       },
     });
     const minRestDays = minRestDaysParam?.value ? parseInt(minRestDaysParam.value, 10) : 30;
@@ -344,13 +345,13 @@ export class MovementService {
         where: { userId },
         select: { farmId: true },
       });
-      const farmIds = userFarms.map(uf => uf.farmId);
+      const farmIds = userFarms.map((uf: { farmId: string }) => uf.farmId);
 
       const herds = await this.prisma.herd.findMany({
         where: { farmId: { in: farmIds } },
         select: { id: true },
       });
-      const herdIds = herds.map(h => h.id);
+      const herdIds = herds.map((h: { id: string }) => h.id);
 
       if (herdIds.length === 0) {
         return {

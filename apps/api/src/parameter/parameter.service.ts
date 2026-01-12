@@ -86,7 +86,7 @@ export class ParameterService {
       select: { key: true },
     });
 
-    const existingKeys = new Set(existing.map((p) => p.key));
+    const existingKeys = new Set(existing.map((p: { key: string }) => p.key));
 
     const toCreate = defaults.filter((d) => !existingKeys.has(d.key));
 

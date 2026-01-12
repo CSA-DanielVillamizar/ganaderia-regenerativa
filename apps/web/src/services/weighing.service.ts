@@ -5,7 +5,7 @@
 export interface CreateWeighingRequest {
   farmId: string;
   herdId: string;
-  weighDate: string;
+  weighDate: string; // YYYY-MM-DD
   numberOfAnimals: number;
   totalWeightKg: number;
 }
@@ -26,17 +26,24 @@ export interface WeighingResponse {
 export async function createWeighing(
   request: CreateWeighingRequest
 ): Promise<WeighingResponse> {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/weighings`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-      body: JSON.stringify(request),
-    }
-  );
+  // Transformar al DTO backend (CreateWeighingDto)
+  const payload = {
+    herdId: request.herdId,
+    weight: request.totalWeightKg,
+    animalCount: request.numberOfAnimals,
+    // Opcionales soportados por backend si se requiere
+    // notes: undefined,
+    // method: 'SCALE',
+  };
+
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/weighings`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
+    },
+    body: JSON.stringify(payload),
+  });
 
   if (!response.ok) {
     throw new Error(`Error registrando pesaje: ${response.statusText}`);

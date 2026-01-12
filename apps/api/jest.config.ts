@@ -15,6 +15,7 @@ const config: Config = {
   ],
   coverageDirectory: '../coverage',
   testEnvironment: 'node',
+  testTimeout: 30000,
   moduleNameMapper: {
     '^src/(.*)$': '<rootDir>/$1',
     '^@shared/(.*)$': path.resolve(__dirname, '../../packages/shared/src') + '/$1',

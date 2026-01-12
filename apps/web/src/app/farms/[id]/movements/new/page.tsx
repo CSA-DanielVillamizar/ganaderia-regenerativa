@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { FormField, DatePicker, Select, FormActions } from '@/components/forms';
 import {
   createMovement,
@@ -96,6 +96,14 @@ export default function MovementNewPage({ params }: PageProps) {
     loadData();
   }, [params.id]);
 
+  // IDs inválidos en query
+  const herdIdIsInvalid = useMemo(() => {
+    return Boolean(herdIdParam) && herds.length > 0 && !herds.find(h => h.id === herdIdParam);
+  }, [herdIdParam, herds]);
+  const paddockIdIsInvalid = useMemo(() => {
+    return Boolean(paddockIdParam) && paddocks.length > 0 && !paddocks.find(p => p.id === paddockIdParam);
+  }, [paddockIdParam, paddocks]);
+
   // Recalcular fecha salida cuando cambien parámetros o fecha
   useEffect(() => {
     if (parameters && entryDate) {
@@ -135,15 +143,10 @@ export default function MovementNewPage({ params }: PageProps) {
       const paddockName =
         paddocks.find((p) => p.id === paddockId)?.name || 'Potrero';
 
-      localStorage.setItem(
-        'toast',
-        JSON.stringify({
-          type: 'success',
-          message: `✅ Movimiento registrado: ${herdName} → ${paddockName}`,
-        })
+      const message = encodeURIComponent(
+        `✅ Movimiento registrado: ${herdName} → ${paddockName}`
       );
-
-      router.push(`/farms/${params.id}/decision-today`);
+      router.push(`/farms/${params.id}/decision-today?status=success&toast=${message}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al guardar');
     } finally {
@@ -177,9 +180,23 @@ export default function MovementNewPage({ params }: PageProps) {
           Entrada del lote a potrero
         </p>
 
-        {error && (
-          <div className="bg-red-100 text-red-700 px-4 py-2 rounded text-sm">
+        {(error || herdIdIsInvalid || paddockIdIsInvalid) && (
+          <div className="bg-red-100 text-red-700 px-4 py-2 rounded text-sm space-y-2">
             {error}
+            {(herdIdIsInvalid || paddockIdIsInvalid) && (
+              <div className="flex items-center justify-between">
+                <span>ID(s) inválido(s) en el contexto</span>
+                <button
+                  className="px-2 py-1 text-xs bg-gray-200 hover:bg-gray-300 rounded"
+                  onClick={() => {
+                    if (herdIdIsInvalid) setHerdId('');
+                    if (paddockIdIsInvalid) setPaddockId('');
+                  }}
+                >
+                  Limpiar selección
+                </button>
+              </div>
+            )}
           </div>
         )}
 

@@ -5,10 +5,10 @@
 export interface CreateForageRequest {
   farmId: string;
   paddockId: string;
-  sampleDate: string;
+  sampleDate: string; // YYYY-MM-DD
   heightCm: number;
   sampleWeightKg: number;
-  drymatterPercent: number;
+  drymatterPercent: number; // 0-100
 }
 
 export interface ForageResponse {
@@ -26,17 +26,32 @@ export interface ForageResponse {
 export async function createForage(
   request: CreateForageRequest
 ): Promise<ForageResponse> {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/forage`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-      body: JSON.stringify(request),
-    }
+  // Transformar al DTO backend (CreateForageSampleDto)
+  const isoSampleDate = `${request.sampleDate}T00:00:00.000Z`;
+  const kgPerHectare = calculateKgPerHectare(
+    request.sampleWeightKg,
+    request.drymatterPercent
   );
+
+  const payload = {
+    paddockId: request.paddockId,
+    kgPerHectare,
+    dryMatter: request.drymatterPercent,
+    sampleDate: isoSampleDate,
+    // Campos opcionales soportados por backend si se requiere:
+    // freshWeightKg: request.sampleWeightKg,
+    // frameAreaM2: 1,
+    // notes: undefined,
+  };
+
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/forage-samples`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
+    },
+    body: JSON.stringify(payload),
+  });
 
   if (!response.ok) {
     throw new Error(`Error registrando aforo: ${response.statusText}`);

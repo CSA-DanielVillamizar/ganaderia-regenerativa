@@ -40,7 +40,7 @@ export class FarmService {
       },
     });
 
-    return userFarms.map((uf) => uf.farm);
+    return userFarms.map((uf: any) => uf.farm);
   }
 
   /**

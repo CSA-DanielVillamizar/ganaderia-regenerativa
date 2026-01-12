@@ -35,8 +35,8 @@ export class DashboardService {
     });
 
     const totalHerds = herds.length;
-    const totalAnimals = herds.reduce((sum, h) => sum + h.animalCount, 0);
-    const totalWeight = herds.reduce((sum, h) => sum + (h.currentWeight || h.initialWeight || 0) * h.animalCount, 0);
+    const totalAnimals = herds.reduce((sum: number, h: any) => sum + h.animalCount, 0);
+    const totalWeight = herds.reduce((sum: number, h: any) => sum + (h.currentWeight || h.initialWeight || 0) * h.animalCount, 0);
     const totalUA = totalWeight / UA_WEIGHT;
     const averageWeightPerAnimal = totalAnimals > 0 ? totalWeight / totalAnimals : 0;
 
@@ -70,7 +70,7 @@ export class DashboardService {
     });
 
     const avgOccupancy = closedMovements.length > 0
-      ? closedMovements.reduce((sum, m) => {
+      ? closedMovements.reduce((sum: number, m: any) => {
           const days = Math.floor((m.exitDate!.getTime() - m.entryDate.getTime()) / (1000 * 60 * 60 * 24));
           return sum + days;
         }, 0) / closedMovements.length
@@ -127,7 +127,7 @@ export class DashboardService {
     });
 
     // Agrupar por lote y calcular tendencias
-    return weighings.map((w, idx) => ({
+    return weighings.map((w: any, idx: number) => ({
       date: w.recordedAt.toISOString().split('T')[0],
       weight: w.weight,
       ua: Math.round((w.weight / UA_WEIGHT) * 100) / 100,
@@ -154,7 +154,7 @@ export class DashboardService {
       take: 50,
     });
 
-    return movements.map((m) => ({
+    return movements.map((m: any) => ({
       paddockName: m.paddock.name,
       entryDate: m.entryDate.toISOString(),
       exitDate: m.exitDate?.toISOString() || null,
@@ -183,7 +183,7 @@ export class DashboardService {
       take: 50,
     });
 
-    return samples.map((s) => ({
+    return samples.map((s: any) => ({
       paddockName: s.paddock.name,
       kgPerHectare: s.kgPerHectare,
       dryMatter: s.dryMatter,
@@ -213,7 +213,7 @@ export class DashboardService {
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-    herds.forEach((herd) => {
+    herds.forEach((herd: any) => {
       if (herd.weighings.length === 0 || herd.weighings[0].recordedAt < sevenDaysAgo) {
         alerts.push({
           severity: 'warning',
@@ -246,7 +246,7 @@ export class DashboardService {
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-    herds.forEach((herd) => {
+    herds.forEach((herd: any) => {
       if (herd.weighings.length === 0 || herd.weighings[0].recordedAt < sevenDaysAgo) {
         alerts.push({
           type: 'MISSING_DATA',
@@ -289,7 +289,7 @@ export class DashboardService {
     });
 
     const now = new Date();
-    longMovements.forEach((m) => {
+    longMovements.forEach((m: any) => {
       const days = Math.floor((now.getTime() - m.entryDate.getTime()) / (1000 * 60 * 60 * 24));
       if (days > 7) {
         alerts.push({
