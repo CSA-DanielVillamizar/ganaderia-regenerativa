@@ -49,5 +49,11 @@
     "prettier": "^3.2.5",
     "turbo": "^2.7.3",
     "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "dexie": "^4.2.1",
+    "rxdb": "^16.21.1",
+    "rxjs": "^7.8.2",
+    "uuid": "^13.0.0"
   }
 }

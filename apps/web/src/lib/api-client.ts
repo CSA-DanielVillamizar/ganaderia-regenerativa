@@ -1,6 +1,7 @@
 import axios, { AxiosInstance, AxiosError, AxiosResponse } from 'axios';
 import { API_URL } from './api-config';
 import { ErrorResponse } from '@ganaderia/shared';
+import { handleApiError, ApiError as AppApiError } from './api-error-handler';
 
 let token: string | null = null;
 
@@ -114,7 +115,7 @@ function normalizeError(axiosError: AxiosError): ApiError {
   };
 }
 
-// Interceptor para errores - Captura y normaliza errores
+// Interceptor para errores - Usa handleApiError centralizado
 apiClient.interceptors.response.use(
   (response: AxiosResponse) => {
     // Capturar traceId del header si existe
@@ -128,14 +129,14 @@ apiClient.interceptors.response.use(
     return response;
   },
   (error: AxiosError) => {
-    const normalizedError = normalizeError(error);
+    // Usar handleApiError centralizado
+    const appError = handleApiError(error);
 
-    // Llamar callback de notificación si está registrado
-    if (
-      errorNotificationCallback &&
-      (error.response?.status === 400 || error.response?.status === 409)
-    ) {
-      errorNotificationCallback(normalizedError);
+    // Si es error de red, retornar null (no throw)
+    // Esto permite que el código que usa apiClient continúe sin crash
+    if (appError === null) {
+      console.warn('Network error, returning null response');
+      return Promise.resolve(null);
     }
 
     // Manejo especial para 401 (No autenticado)
@@ -149,7 +150,19 @@ apiClient.interceptors.response.use(
       }
     }
 
-    return Promise.reject(normalizedError);
+    // Llamar callback de notificación si está registrado
+    if (errorNotificationCallback && appError) {
+      errorNotificationCallback({
+        statusCode: appError.statusCode || 500,
+        message: appError.message,
+        error: appError.type,
+        path: error.config?.url || '',
+        timestamp: new Date().toISOString(),
+        traceId: appError.traceId || 'N/A',
+      });
+    }
+
+    return Promise.reject(appError);
   }
 );
 
