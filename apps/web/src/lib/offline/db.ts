@@ -7,7 +7,14 @@
 import { createRxDatabase, addRxPlugin } from 'rxdb';
 import type { RxDatabase, RxCollection } from 'rxdb';
 import { getRxStorageDexie } from 'rxdb/plugins/storage-dexie';
-import { forageSchema, movementSchema, weighingSchema, syncQueueSchema } from './schemas';
+import {
+  forageSchema,
+  movementSchema,
+  weighingSchema,
+  syncQueueSchema,
+  herdSchema,
+  paddockSchema,
+} from './schemas';
 
 /**
  * Tipos para las colecciones RxDB
@@ -75,6 +82,30 @@ export interface SyncQueueDoc {
   updatedAt: string;
 }
 
+export interface HerdDoc {
+  id: string;
+  farmId: string;
+  name: string;
+  category: string;
+  numberOfAnimals: number;
+  currentWeight: number;
+  averageWeight: number;
+  status: 'ACTIVE' | 'ARCHIVED';
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PaddockDoc {
+  id: string;
+  farmId: string;
+  name: string;
+  hectares: number;
+  lastExitDate?: string;
+  status: 'AVAILABLE' | 'OCCUPIED' | 'RESTING';
+  createdAt: string;
+  updatedAt: string;
+}
+
 /**
  * Tipo de la base de datos RxDB
  */
@@ -83,6 +114,8 @@ export type GanaderiaDB = RxDatabase<{
   movements: RxCollection<MovementDoc>;
   weighings: RxCollection<WeighingDoc>;
   syncQueue: RxCollection<SyncQueueDoc>;
+  herds: RxCollection<HerdDoc>;
+  paddocks: RxCollection<PaddockDoc>;
 }>;
 
 let dbPromise: Promise<GanaderiaDB> | null = null;
@@ -127,6 +160,12 @@ export async function getDb(): Promise<GanaderiaDB> {
       },
       syncQueue: {
         schema: syncQueueSchema,
+      },
+      herds: {
+        schema: herdSchema,
+      },
+      paddocks: {
+        schema: paddockSchema,
       },
     });
 

@@ -375,3 +375,137 @@ export const syncQueueSchema: RxJsonSchema<{
     'updatedAt',
   ],
 };
+
+/**
+ * Esquema para lotes (herds)
+ * Almacena información de los lotes de ganado
+ */
+export const herdSchema: RxJsonSchema<{
+  id: string;
+  farmId: string;
+  name: string;
+  category: string;
+  numberOfAnimals: number;
+  currentWeight: number;
+  averageWeight: number;
+  status: 'ACTIVE' | 'ARCHIVED';
+  createdAt: string;
+  updatedAt: string;
+}> = {
+  title: 'Herd',
+  version: 0,
+  primaryKey: 'id',
+  type: 'object',
+  properties: {
+    id: {
+      type: 'string',
+      description: 'ID único del lote',
+    },
+    farmId: {
+      type: 'string',
+      description: 'ID de la finca',
+    },
+    name: {
+      type: 'string',
+      description: 'Nombre del lote',
+    },
+    category: {
+      type: 'string',
+      description: 'Categoría del ganado',
+    },
+    numberOfAnimals: {
+      type: 'number',
+      description: 'Cantidad de animales',
+    },
+    currentWeight: {
+      type: 'number',
+      description: 'Peso actual del lote en kg',
+    },
+    averageWeight: {
+      type: 'number',
+      description: 'Peso promedio por animal',
+    },
+    status: {
+      type: 'string',
+      enum: ['ACTIVE', 'ARCHIVED'],
+      description: 'Estado del lote',
+    },
+    createdAt: {
+      type: 'string',
+      format: 'date-time',
+    },
+    updatedAt: {
+      type: 'string',
+      format: 'date-time',
+    },
+  },
+  required: [
+    'id',
+    'farmId',
+    'name',
+    'category',
+    'numberOfAnimals',
+    'currentWeight',
+    'averageWeight',
+    'status',
+    'createdAt',
+    'updatedAt',
+  ],
+};
+
+/**
+ * Esquema para potreros (paddocks)
+ * Almacena información de los potreros de la finca
+ */
+export const paddockSchema: RxJsonSchema<{
+  id: string;
+  farmId: string;
+  name: string;
+  hectares: number;
+  lastExitDate?: string;
+  status: 'AVAILABLE' | 'OCCUPIED' | 'RESTING';
+  createdAt: string;
+  updatedAt: string;
+}> = {
+  title: 'Paddock',
+  version: 0,
+  primaryKey: 'id',
+  type: 'object',
+  properties: {
+    id: {
+      type: 'string',
+      description: 'ID único del potrero',
+    },
+    farmId: {
+      type: 'string',
+      description: 'ID de la finca',
+    },
+    name: {
+      type: 'string',
+      description: 'Nombre del potrero',
+    },
+    hectares: {
+      type: 'number',
+      description: 'Área en hectáreas',
+    },
+    lastExitDate: {
+      type: 'string',
+      format: 'date-time',
+      description: 'Última fecha de salida del lote',
+    },
+    status: {
+      type: 'string',
+      enum: ['AVAILABLE', 'OCCUPIED', 'RESTING'],
+      description: 'Estado del potrero',
+    },
+    createdAt: {
+      type: 'string',
+      format: 'date-time',
+    },
+    updatedAt: {
+      type: 'string',
+      format: 'date-time',
+    },
+  },
+  required: ['id', 'farmId', 'name', 'hectares', 'status', 'createdAt', 'updatedAt'],
+};

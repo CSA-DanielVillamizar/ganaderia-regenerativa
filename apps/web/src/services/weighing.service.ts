@@ -8,8 +8,9 @@
  */
 
 import { v4 as uuidv4 } from 'uuid';
-import { getDb, enqueueSyncOperation } from '@/lib/offline/sync-replicator';
-import { apiClient } from '@/lib/api-client';
+import { getDb } from '@/lib/offline/db';
+import { enqueueSyncOperation } from '@/lib/offline/sync-replicator';
+import apiClient from '@/lib/api-client';
 
 /**
  * Interfaz para Pesaje
@@ -92,7 +93,12 @@ export async function createWeighing(
     await db.weighings.insert(weighing);
 
     // 2. Encolar para sincronización
-    await enqueueSyncOperation('Weighing', 'CREATE', weighing);
+    await enqueueSyncOperation({
+      entity: 'weighing',
+      operation: 'CREATE',
+      localId: weighing.localId,
+      payload: weighing,
+    });
 
     // 3. Retornar respuesta optimista
     return weighing;

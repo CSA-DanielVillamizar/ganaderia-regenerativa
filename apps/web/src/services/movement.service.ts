@@ -8,8 +8,9 @@
  */
 
 import { v4 as uuidv4 } from 'uuid';
-import { getDb, enqueueSyncOperation } from '@/lib/offline/sync-replicator';
-import { apiClient } from '@/lib/api-client';
+import { getDb } from '@/lib/offline/db';
+import { enqueueSyncOperation } from '@/lib/offline/sync-replicator';
+import apiClient from '@/lib/api-client';
 
 /**
  * Interfaz para Movimiento de Lote
@@ -75,7 +76,12 @@ export async function createMovement(
     await db.movements.insert(movement);
 
     // 2. Encolar para sincronización
-    await enqueueSyncOperation('Movement', 'CREATE', movement);
+    await enqueueSyncOperation({
+      entity: 'movement',
+      operation: 'CREATE',
+      localId: movement.localId,
+      payload: movement,
+    });
 
     // 3. Retornar respuesta optimista (sin esperar sync)
     return movement;
@@ -236,7 +242,12 @@ export async function closeMovement(movementId: string, actualExitDate: string):
     await db.movements.atomicUpdate(movementId, () => updated);
 
     // 5. Encolar para sincronización (como UPDATE)
-    await enqueueSyncOperation('Movement', 'UPDATE', updated);
+    await enqueueSyncOperation({
+      entity: 'movement',
+      operation: 'UPDATE',
+      localId: movementId,
+      payload: updated,
+    });
 
     return updated;
   } catch (error) {
