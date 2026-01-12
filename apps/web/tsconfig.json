@@ -15,9 +15,7 @@
     "baseUrl": ".",
     "paths": {
       "@web/*": ["src/*"],
-      "@/*": ["src/*"],
-      "@shared": ["../../packages/shared/src/index.ts"],
-      "@shared/*": ["../../packages/shared/src/*"]
+      "@/*": ["src/*"]
     },
     "incremental": true,
     "isolatedModules": true,
