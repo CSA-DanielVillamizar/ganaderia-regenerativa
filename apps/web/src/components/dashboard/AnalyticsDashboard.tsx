@@ -62,15 +62,6 @@ export default function AnalyticsDashboard() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-          <span className="text-4xl">📊</span>
-          Dashboard Agronómico
-        </h1>
-        <p className="text-gray-600 mt-2">Análisis en tiempo real basado en Metodología Voisin</p>
-      </div>
-
       {/* Error Message */}
       {error && (
         <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded">

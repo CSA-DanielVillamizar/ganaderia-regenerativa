@@ -1,10 +1,11 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { useLogout } from '@web/hooks/useAuth';
 import { Button } from '@web/components/common/Button';
-import { LogOut, Home, Leaf, Beef, BarChart3, MoveRight, Grid3x3 } from 'lucide-react';
+import { LogOut, Leaf, Beef, BarChart3, MoveRight, Grid3x3, HelpCircle } from 'lucide-react';
+import FieldGuideViewer from '@web/components/common/FieldGuideViewer';
 import { FarmSwitcher } from './FarmSwitcher';
 import { OfflineIndicator } from './OfflineIndicator';
 
@@ -17,6 +18,7 @@ const navItems = [
 ];
 
 export function Sidebar() {
+  const [isGuideOpen, setGuideOpen] = useState(false);
   const logout = useLogout();
 
   return (
@@ -28,7 +30,16 @@ export function Sidebar() {
           <FarmSwitcher />
         </div>
         <div className="mt-4 pt-4 border-t border-green-700">
-          <OfflineIndicator />
+          <div className="flex items-center justify-between gap-2">
+            <OfflineIndicator />
+            <button
+              onClick={() => setGuideOpen(true)}
+              className="p-2 rounded-full hover:bg-green-700 focus:outline-none"
+              aria-label="Guía de Campo"
+            >
+              <HelpCircle className="w-5 h-5" />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -57,11 +68,13 @@ export function Sidebar() {
           Salir
         </Button>
       </div>
+      <FieldGuideViewer open={isGuideOpen} onClose={() => setGuideOpen(false)} />
     </div>
   );
 }
 
 export function BottomNav() {
+  const [isGuideOpen, setGuideOpen] = useState(false);
   const logout = useLogout();
 
   return (
@@ -85,10 +98,20 @@ export function BottomNav() {
           <LogOut className="w-6 h-6 mb-1" />
           Salir
         </button>
+        <button
+          onClick={() => setGuideOpen(true)}
+          className="flex flex-col items-center text-xs text-gray-700 hover:text-green-600"
+          aria-label="Guía de Campo"
+        >
+          <HelpCircle className="w-6 h-6 mb-1" />
+          Ayuda
+        </button>
       </div>
       <div className="border-l border-gray-200 pl-3 ml-3">
         <OfflineIndicator />
       </div>
+
+      <FieldGuideViewer open={isGuideOpen} onClose={() => setGuideOpen(false)} />
     </div>
   );
 }

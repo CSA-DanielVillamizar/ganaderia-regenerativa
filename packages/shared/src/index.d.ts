@@ -22,6 +22,10 @@ export declare enum WeighingMethod {
     SCALE = "SCALE",
     TAPE = "TAPE"
 }
+export declare enum Season {
+    INVIERNO = "INVIERNO",
+    VERANO = "VERANO"
+}
 export declare const LoginDtoSchema: z.ZodObject<{
     email: z.ZodString;
     password: z.ZodString;
@@ -41,32 +45,32 @@ export declare const AuthResponseSchema: z.ZodObject<{
         name: z.ZodString;
         role: z.ZodNativeEnum<typeof Role>;
     }, "strip", z.ZodTypeAny, {
-        email: string;
         id: string;
+        email: string;
         name: string;
         role: Role;
     }, {
-        email: string;
         id: string;
+        email: string;
         name: string;
         role: Role;
     }>;
 }, "strip", z.ZodTypeAny, {
+    accessToken: string;
     user: {
-        email: string;
         id: string;
+        email: string;
         name: string;
         role: Role;
     };
-    accessToken: string;
 }, {
+    accessToken: string;
     user: {
-        email: string;
         id: string;
+        email: string;
         name: string;
         role: Role;
     };
-    accessToken: string;
 }>;
 export type AuthResponse = z.infer<typeof AuthResponseSchema>;
 export declare const CreateFarmDtoSchema: z.ZodObject<{
@@ -311,9 +315,9 @@ export declare const MovementResponseSchema: z.ZodObject<{
     createdAt: z.ZodString;
     updatedAt: z.ZodString;
 }, "strip", z.ZodTypeAny, {
+    id: string;
     type: MovementType;
     status: string;
-    id: string;
     createdAt: string;
     updatedAt: string;
     herdId: string;
@@ -324,9 +328,9 @@ export declare const MovementResponseSchema: z.ZodObject<{
     exitDate: string | null;
     daysOccupied: number | null;
 }, {
+    id: string;
     type: MovementType;
     status: string;
-    id: string;
     createdAt: string;
     updatedAt: string;
     herdId: string;
@@ -542,4 +546,362 @@ export declare const DashboardTrendSchema: z.ZodObject<{
     gain: number;
 }>;
 export type DashboardTrend = z.infer<typeof DashboardTrendSchema>;
+export declare const DecisionTodayActionItemSchema: z.ZodObject<{
+    id: z.ZodOptional<z.ZodString>;
+    label: z.ZodString;
+    done: z.ZodOptional<z.ZodBoolean>;
+}, "strip", z.ZodTypeAny, {
+    label: string;
+    id?: string | undefined;
+    done?: boolean | undefined;
+}, {
+    label: string;
+    id?: string | undefined;
+    done?: boolean | undefined;
+}>;
+export type DecisionTodayActionItem = z.infer<typeof DecisionTodayActionItemSchema>;
+export declare const DecisionTodayResponseSchema: z.ZodObject<{
+    farmId: z.ZodString;
+    confidenceLevel: z.ZodOptional<z.ZodEnum<["HIGH", "MEDIUM", "LOW"]>>;
+    confidenceScore: z.ZodOptional<z.ZodNumber>;
+    explainability: z.ZodOptional<z.ZodString>;
+    actionChecklist: z.ZodOptional<z.ZodArray<z.ZodObject<{
+        id: z.ZodOptional<z.ZodString>;
+        label: z.ZodString;
+        done: z.ZodOptional<z.ZodBoolean>;
+    }, "strip", z.ZodTypeAny, {
+        label: string;
+        id?: string | undefined;
+        done?: boolean | undefined;
+    }, {
+        label: string;
+        id?: string | undefined;
+        done?: boolean | undefined;
+    }>, "many">>;
+    recommendedHerdId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    recommendedPaddockId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    activeMovementId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+}, "strip", z.ZodTypeAny, {
+    farmId: string;
+    confidenceLevel?: "HIGH" | "MEDIUM" | "LOW" | undefined;
+    confidenceScore?: number | undefined;
+    explainability?: string | undefined;
+    actionChecklist?: {
+        label: string;
+        id?: string | undefined;
+        done?: boolean | undefined;
+    }[] | undefined;
+    recommendedHerdId?: string | null | undefined;
+    recommendedPaddockId?: string | null | undefined;
+    activeMovementId?: string | null | undefined;
+}, {
+    farmId: string;
+    confidenceLevel?: "HIGH" | "MEDIUM" | "LOW" | undefined;
+    confidenceScore?: number | undefined;
+    explainability?: string | undefined;
+    actionChecklist?: {
+        label: string;
+        id?: string | undefined;
+        done?: boolean | undefined;
+    }[] | undefined;
+    recommendedHerdId?: string | null | undefined;
+    recommendedPaddockId?: string | null | undefined;
+    activeMovementId?: string | null | undefined;
+}>;
+export type DecisionTodayResponse = z.infer<typeof DecisionTodayResponseSchema>;
+/**
+ * Contrato de error estandarizado para todas las respuestas de error.
+ */
+export declare const ErrorResponseSchema: z.ZodObject<{
+    statusCode: z.ZodNumber;
+    message: z.ZodString;
+    error: z.ZodString;
+    path: z.ZodString;
+    timestamp: z.ZodString;
+    traceId: z.ZodString;
+}, "strip", z.ZodTypeAny, {
+    path: string;
+    message: string;
+    error: string;
+    statusCode: number;
+    timestamp: string;
+    traceId: string;
+}, {
+    path: string;
+    message: string;
+    error: string;
+    statusCode: number;
+    timestamp: string;
+    traceId: string;
+}>;
+export type ErrorResponse = z.infer<typeof ErrorResponseSchema>;
+/**
+ * Respuesta paginada genérica para listados.
+ */
+export declare const PaginatedResponseSchema: z.ZodObject<{
+    data: z.ZodArray<z.ZodUnknown, "many">;
+    pagination: z.ZodObject<{
+        total: z.ZodNumber;
+        page: z.ZodNumber;
+        limit: z.ZodNumber;
+        totalPages: z.ZodNumber;
+    }, "strip", z.ZodTypeAny, {
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+    }, {
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+    }>;
+}, "strip", z.ZodTypeAny, {
+    data: unknown[];
+    pagination: {
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+    };
+}, {
+    data: unknown[];
+    pagination: {
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+    };
+}>;
+export type PaginatedResponse<T = unknown> = {
+    data: T[];
+    pagination: {
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+    };
+};
+/**
+ * Response para listado de movimientos con paginación.
+ */
+export declare const ListMovementsResponseSchema: z.ZodObject<{
+    data: z.ZodArray<z.ZodObject<{
+        id: z.ZodString;
+        herdId: z.ZodString;
+        paddockId: z.ZodString;
+        cycleId: z.ZodNullable<z.ZodString>;
+        type: z.ZodNativeEnum<typeof MovementType>;
+        status: z.ZodString;
+        entryDate: z.ZodString;
+        exitDate: z.ZodNullable<z.ZodString>;
+        daysOccupied: z.ZodNullable<z.ZodNumber>;
+        notes: z.ZodNullable<z.ZodString>;
+        createdAt: z.ZodString;
+        updatedAt: z.ZodString;
+    }, "strip", z.ZodTypeAny, {
+        id: string;
+        type: MovementType;
+        status: string;
+        createdAt: string;
+        updatedAt: string;
+        herdId: string;
+        notes: string | null;
+        paddockId: string;
+        cycleId: string | null;
+        entryDate: string;
+        exitDate: string | null;
+        daysOccupied: number | null;
+    }, {
+        id: string;
+        type: MovementType;
+        status: string;
+        createdAt: string;
+        updatedAt: string;
+        herdId: string;
+        notes: string | null;
+        paddockId: string;
+        cycleId: string | null;
+        entryDate: string;
+        exitDate: string | null;
+        daysOccupied: number | null;
+    }>, "many">;
+    pagination: z.ZodObject<{
+        total: z.ZodNumber;
+        page: z.ZodNumber;
+        limit: z.ZodNumber;
+        totalPages: z.ZodNumber;
+    }, "strip", z.ZodTypeAny, {
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+    }, {
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+    }>;
+}, "strip", z.ZodTypeAny, {
+    data: {
+        id: string;
+        type: MovementType;
+        status: string;
+        createdAt: string;
+        updatedAt: string;
+        herdId: string;
+        notes: string | null;
+        paddockId: string;
+        cycleId: string | null;
+        entryDate: string;
+        exitDate: string | null;
+        daysOccupied: number | null;
+    }[];
+    pagination: {
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+    };
+}, {
+    data: {
+        id: string;
+        type: MovementType;
+        status: string;
+        createdAt: string;
+        updatedAt: string;
+        herdId: string;
+        notes: string | null;
+        paddockId: string;
+        cycleId: string | null;
+        entryDate: string;
+        exitDate: string | null;
+        daysOccupied: number | null;
+    }[];
+    pagination: {
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+    };
+}>;
+export type ListMovementsResponse = PaginatedResponse<MovementResponse>;
+/**
+ * Configuración de temporada con factor multiplicador para días de descanso.
+ */
+export interface SeasonConfig {
+    name: Season;
+    factor: number;
+    description: string;
+}
+/**
+ * Alerta de sobrepastoreo con severidad.
+ */
+export declare const OvergrazingAlertSchema: z.ZodObject<{
+    id: z.ZodString;
+    herdId: z.ZodString;
+    herdName: z.ZodString;
+    paddockId: z.ZodString;
+    paddockName: z.ZodString;
+    daysOccupied: z.ZodNumber;
+    maxAllowedDays: z.ZodNumber;
+    exceedDays: z.ZodNumber;
+    entryDate: z.ZodDate;
+    severity: z.ZodEnum<["MEDIUM", "HIGH", "CRITICAL"]>;
+}, "strip", z.ZodTypeAny, {
+    id: string;
+    herdId: string;
+    paddockId: string;
+    entryDate: Date;
+    daysOccupied: number;
+    severity: "HIGH" | "MEDIUM" | "CRITICAL";
+    paddockName: string;
+    herdName: string;
+    maxAllowedDays: number;
+    exceedDays: number;
+}, {
+    id: string;
+    herdId: string;
+    paddockId: string;
+    entryDate: Date;
+    daysOccupied: number;
+    severity: "HIGH" | "MEDIUM" | "CRITICAL";
+    paddockName: string;
+    herdName: string;
+    maxAllowedDays: number;
+    exceedDays: number;
+}>;
+export type OvergrazingAlert = z.infer<typeof OvergrazingAlertSchema>;
+export declare const OvergrazingAlertsResponseSchema: z.ZodObject<{
+    data: z.ZodArray<z.ZodObject<{
+        id: z.ZodString;
+        herdId: z.ZodString;
+        herdName: z.ZodString;
+        paddockId: z.ZodString;
+        paddockName: z.ZodString;
+        daysOccupied: z.ZodNumber;
+        maxAllowedDays: z.ZodNumber;
+        exceedDays: z.ZodNumber;
+        entryDate: z.ZodDate;
+        severity: z.ZodEnum<["MEDIUM", "HIGH", "CRITICAL"]>;
+    }, "strip", z.ZodTypeAny, {
+        id: string;
+        herdId: string;
+        paddockId: string;
+        entryDate: Date;
+        daysOccupied: number;
+        severity: "HIGH" | "MEDIUM" | "CRITICAL";
+        paddockName: string;
+        herdName: string;
+        maxAllowedDays: number;
+        exceedDays: number;
+    }, {
+        id: string;
+        herdId: string;
+        paddockId: string;
+        entryDate: Date;
+        daysOccupied: number;
+        severity: "HIGH" | "MEDIUM" | "CRITICAL";
+        paddockName: string;
+        herdName: string;
+        maxAllowedDays: number;
+        exceedDays: number;
+    }>, "many">;
+    totalAlerts: z.ZodNumber;
+    criticalAlerts: z.ZodNumber;
+    highAlerts: z.ZodNumber;
+}, "strip", z.ZodTypeAny, {
+    data: {
+        id: string;
+        herdId: string;
+        paddockId: string;
+        entryDate: Date;
+        daysOccupied: number;
+        severity: "HIGH" | "MEDIUM" | "CRITICAL";
+        paddockName: string;
+        herdName: string;
+        maxAllowedDays: number;
+        exceedDays: number;
+    }[];
+    totalAlerts: number;
+    criticalAlerts: number;
+    highAlerts: number;
+}, {
+    data: {
+        id: string;
+        herdId: string;
+        paddockId: string;
+        entryDate: Date;
+        daysOccupied: number;
+        severity: "HIGH" | "MEDIUM" | "CRITICAL";
+        paddockName: string;
+        herdName: string;
+        maxAllowedDays: number;
+        exceedDays: number;
+    }[];
+    totalAlerts: number;
+    criticalAlerts: number;
+    highAlerts: number;
+}>;
+export type OvergrazingAlertsResponse = z.infer<typeof OvergrazingAlertsResponseSchema>;
 //# sourceMappingURL=index.d.ts.map

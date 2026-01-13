@@ -8,6 +8,7 @@
     "webpack": false,
     "tsConfigPath": "tsconfig.build.json",
     "assets": [],
-    "watchAssets": false
+    "watchAssets": false,
+    "outDir": "./dist"
   }
 }

@@ -13,6 +13,7 @@
     "start": "node dist/apps/api/src/main",
     "start:prod": "node dist/apps/api/src/main",
     "build": "nest build",
+    "start:dev": "npx nest build && node dist/apps/api/src/main",
     "prisma:generate": "cross-env NODE_OPTIONS=--use-system-ca prisma generate",
     "pretest:api": "npm run prisma:generate",
     "test": "jest --runInBand",
