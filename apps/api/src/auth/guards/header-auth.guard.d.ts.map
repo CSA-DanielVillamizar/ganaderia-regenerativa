@@ -1,0 +1,1 @@
+{"version":3,"file":"header-auth.guard.d.ts","sourceRoot":"","sources":["header-auth.guard.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,WAAW,EAAE,gBAAgB,EAAqC,MAAM,gBAAgB,CAAC;AAElG,qBACa,eAAgB,YAAW,WAAW;IACjD,WAAW,CAAC,OAAO,EAAE,gBAAgB,GAAG,OAAO;CAehD"}

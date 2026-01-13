@@ -1,0 +1,5 @@
+import { CanActivate, ExecutionContext } from '@nestjs/common';
+export declare class HeaderAuthGuard implements CanActivate {
+    canActivate(context: ExecutionContext): boolean;
+}
+//# sourceMappingURL=header-auth.guard.d.ts.map

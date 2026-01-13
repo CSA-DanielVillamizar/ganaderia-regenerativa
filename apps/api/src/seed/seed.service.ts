@@ -11,8 +11,23 @@ export class SeedService {
   /**
    * Crea datos de prueba para una finca
    */
-  async createDemoData(farmId: string) {
+  async createDemoData(farmId?: string) {
     const now = new Date();
+
+    // Si no hay farmId, obtener la primera finca de la DB
+    if (!farmId) {
+      const farm = await this.prisma.farm.findFirst({
+        where: { active: true },
+      });
+
+      if (!farm) {
+        throw new Error(
+          'No hay fincas disponibles. Crea una finca primero.',
+        );
+      }
+
+      farmId = farm.id;
+    }
 
     // 1. Crear 3 potreros
     const paddocks = await this.prisma.$transaction([
