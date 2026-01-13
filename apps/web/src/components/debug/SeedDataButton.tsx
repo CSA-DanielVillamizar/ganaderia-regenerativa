@@ -3,17 +3,17 @@
 import React, { useState } from 'react';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
 import { getDb } from '@/lib/offline/db';
+import type { HerdDoc, PaddockDoc, MovementDoc } from '@/lib/offline/db';
 import { v4 as uuidv4 } from 'uuid';
 
 /**
  * Botón de Carga de Datos de Prueba (Seed Data)
  * Usa RxDB para insertar datos offline-first
- * 
+ *
  * Crea:
- * - 1 Finca: "Hacienda La Esperanza"
- * - 3 Potreros: "El Roble" (10 días), "La Ceiba" (50 días), "Samán" (nuevo)
+ * - 3 Potreros: "El Roble", "La Ceiba", "Samán"
  * - 1 Hato: "Novillos Levante" (20 animales)
- * - 1 Movimiento activo
+ * - 1 Movimiento activo en Samán
  */
 export default function SeedDataButton() {
   const [loading, setLoading] = useState(false);
@@ -30,102 +30,90 @@ export default function SeedDataButton() {
       const db = await getDb();
       const now = new Date();
 
-      // 1️⃣ Crear Finca
-      const farmId = uuidv4();
-      await db.herds.insert({
-        id: farmId,
-        name: 'Hacienda La Esperanza',
-        location: 'Región Andina',
-        hectares: 50,
-        active: true,
-        syncStatus: 'pending',
-        createdAt: now.toISOString(),
-      } as any);
-      console.log('✅ Finca creada:', farmId);
+      // Usar la misma farmId que el usuario activo (temporal para pruebas)
+      const farmId = 'farm-demo-001';
 
-      // 2️⃣ Crear Potreros
+      // 1️⃣ Crear Potreros con campos exactos del schema
       const paddock1Id = uuidv4();
       const paddock2Id = uuidv4();
       const paddock3Id = uuidv4();
 
-      const paddocks = [
+      const paddocks: PaddockDoc[] = [
         {
           id: paddock1Id,
           farmId,
           name: 'El Roble',
           hectares: 8,
-          minRestDays: 30,
           lastExitDate: new Date(now.getTime() - 10 * 24 * 60 * 60 * 1000).toISOString(),
-          active: true,
-          syncStatus: 'pending',
+          status: 'AVAILABLE',
           createdAt: now.toISOString(),
+          updatedAt: now.toISOString(),
         },
         {
           id: paddock2Id,
           farmId,
           name: 'La Ceiba',
           hectares: 12,
-          minRestDays: 30,
           lastExitDate: new Date(now.getTime() - 50 * 24 * 60 * 60 * 1000).toISOString(),
-          active: true,
-          syncStatus: 'pending',
+          status: 'RESTING',
           createdAt: now.toISOString(),
+          updatedAt: now.toISOString(),
         },
         {
           id: paddock3Id,
           farmId,
           name: 'Samán',
           hectares: 10,
-          minRestDays: 30,
-          lastExitDate: null,
-          active: true,
-          syncStatus: 'pending',
+          status: 'AVAILABLE',
           createdAt: now.toISOString(),
+          updatedAt: now.toISOString(),
         },
       ];
 
       for (const paddock of paddocks) {
-        await db.paddocks.insert(paddock as any);
+        await db.paddocks.insert(paddock);
         console.log(`✅ Potrero creado: ${paddock.name}`);
       }
 
-      // 3️⃣ Crear Hato
+      // 2️⃣ Crear Hato con campos exactos del schema
       const herdId = uuidv4();
-      await db.herds.insert({
+      const herd: HerdDoc = {
         id: herdId,
         farmId,
         name: 'Novillos Levante',
-        animalCount: 20,
-        initialWeight: 7000,
+        category: 'Ganado Joven',
+        numberOfAnimals: 20,
         currentWeight: 7000,
-        breedType: 'Mestizo',
-        description: 'Lote de prueba para demostración',
-        active: true,
-        syncStatus: 'pending',
+        averageWeight: 350,
+        status: 'ACTIVE',
         createdAt: now.toISOString(),
-      } as any);
+        updatedAt: now.toISOString(),
+      };
+
+      await db.herds.insert(herd);
       console.log('✅ Hato creado:', herdId);
 
-      // 4️⃣ Crear Movimiento Activo
+      // 3️⃣ Crear Movimiento Activo
       const movementId = uuidv4();
-      await db.movements.insert({
-        id: movementId,
+      const movement: MovementDoc = {
+        localId: movementId,
         herdId,
         paddockId: paddock3Id,
+        farmId,
         entryDate: now.toISOString(),
-        exitDate: null,
-        status: 'active',
-        duration: 0,
-        daysRested: 0,
+        estimatedExitDate: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        status: 'ACTIVE',
         syncStatus: 'pending',
         createdAt: now.toISOString(),
-      } as any);
-      console.log('✅ Movimiento creado:', movementId);
+        updatedAt: now.toISOString(),
+      };
 
+      await db.movements.insert(movement);
+      console.log('✅ Movimiento creado:', movementId);
 
       setStatus({
         type: 'success',
-        message: `✅ ¡Datos cargados! Finca: Hacienda La Esperanza | Potreros: 3 | Hato: Novillos Levante (20 animales) | Movimiento activo en Samán`,
+        message: `✅ ¡Datos cargados! Potreros: 3 | Hato: Novillos Levante (20 animales) | Movimiento activo`,
       });
 
       // Recargar página después de 2 segundos
@@ -174,10 +162,9 @@ export default function SeedDataButton() {
         <p className="text-xs text-gray-600 mb-4 leading-relaxed">
           Crea automáticamente:
           <ul className="list-disc pl-4 mt-2 space-y-1 text-gray-700">
-            <li>Finca: &quot;Hacienda La Esperanza&quot;</li>
-            <li>3 Potreros (descanso: 10, 50 y 0 días)</li>
-            <li>Hato: &quot;Novillos Levante&quot; (20 animales)</li>
-            <li>Movimiento activo en Samán</li>
+            <li>3 Potreros: El Roble, La Ceiba, Samán</li>
+            <li>1 Hato: &quot;Novillos Levante&quot; (20 animales)</li>
+            <li>1 Movimiento activo</li>
           </ul>
         </p>
 
