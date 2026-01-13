@@ -17,6 +17,7 @@ import { CalibrationModule } from './calibration/calibration.module';
 import { CycleModule } from './cycle/cycle.module';
 import { IndicatorsModule } from './indicators/indicators.module';
 import { ExportModule } from './export/export.module';
+import { SeedModule } from './seed/seed.module';
 import { HealthController } from './health/health.controller';
 
 @Module({
@@ -39,6 +40,7 @@ import { HealthController } from './health/health.controller';
     CycleModule,
     IndicatorsModule,
     ExportModule,
+    SeedModule, // ← Módulo de seed data para desarrollo
   ],
   controllers: [HealthController],
   providers: [
