@@ -27,11 +27,20 @@ export default function SeedDataButton() {
       setLoading(true);
       setStatus({ type: 'loading', message: '🌱 Cargando datos de prueba...' });
 
+      console.log('[SeedDataButton] Iniciando carga de datos...');
+
       const db = await getDb();
+      console.log('[SeedDataButton] DB obtenida:', db);
+
+      if (!db) {
+        throw new Error('No se pudo obtener la instancia de RxDB');
+      }
+
       const now = new Date();
 
       // Usar la misma farmId que el usuario activo (temporal para pruebas)
       const farmId = 'farm-demo-001';
+      console.log('[SeedDataButton] FarmId:', farmId);
 
       // 1️⃣ Crear Potreros con campos exactos del schema
       const paddock1Id = uuidv4();
@@ -71,8 +80,14 @@ export default function SeedDataButton() {
       ];
 
       for (const paddock of paddocks) {
-        await db.paddocks.insert(paddock);
-        console.log(`✅ Potrero creado: ${paddock.name}`);
+        console.log('[SeedDataButton] Intentando insertar potrero:', paddock);
+        try {
+          await db.paddocks.insert(paddock);
+          console.log(`✅ Potrero creado: ${paddock.name}`);
+        } catch (paddockError) {
+          console.error(`❌ Error creando potrero ${paddock.name}:`, paddockError);
+          throw paddockError;
+        }
       }
 
       // 2️⃣ Crear Hato con campos exactos del schema
@@ -90,8 +105,14 @@ export default function SeedDataButton() {
         updatedAt: now.toISOString(),
       };
 
-      await db.herds.insert(herd);
-      console.log('✅ Hato creado:', herdId);
+      console.log('[SeedDataButton] Intentando insertar hato:', herd);
+      try {
+        await db.herds.insert(herd);
+        console.log('✅ Hato creado:', herdId);
+      } catch (herdError) {
+        console.error('❌ Error creando hato:', herdError);
+        throw herdError;
+      }
 
       // 3️⃣ Crear Movimiento Activo
       const movementId = uuidv4();
@@ -108,8 +129,14 @@ export default function SeedDataButton() {
         updatedAt: now.toISOString(),
       };
 
-      await db.movements.insert(movement);
-      console.log('✅ Movimiento creado:', movementId);
+      console.log('[SeedDataButton] Intentando insertar movimiento:', movement);
+      try {
+        await db.movements.insert(movement);
+        console.log('✅ Movimiento creado:', movementId);
+      } catch (movementError) {
+        console.error('❌ Error creando movimiento:', movementError);
+        throw movementError;
+      }
 
       setStatus({
         type: 'success',
@@ -120,8 +147,9 @@ export default function SeedDataButton() {
       setTimeout(() => window.location.reload(), 2000);
     } catch (error) {
       const msg = error instanceof Error ? error.message : 'Error desconocido';
+      console.error('[SeedDataButton] Error completo:', error);
+      console.error('[SeedDataButton] Stack:', error instanceof Error ? error.stack : 'N/A');
       setStatus({ type: 'error', message: `❌ ${msg}` });
-      console.error('Error cargando datos:', error);
     } finally {
       setLoading(false);
     }
@@ -159,14 +187,14 @@ export default function SeedDataButton() {
         )}
 
         {/* Description */}
-        <p className="text-xs text-gray-600 mb-4 leading-relaxed">
-          Crea automáticamente:
-          <ul className="list-disc pl-4 mt-2 space-y-1 text-gray-700">
+        <div className="text-xs text-gray-600 mb-4 leading-relaxed">
+          <p className="mb-2">Crea automáticamente:</p>
+          <ul className="list-disc pl-4 space-y-1 text-gray-700">
             <li>3 Potreros: El Roble, La Ceiba, Samán</li>
             <li>1 Hato: &quot;Novillos Levante&quot; (20 animales)</li>
             <li>1 Movimiento activo</li>
           </ul>
-        </p>
+        </div>
 
         {/* Button */}
         <button

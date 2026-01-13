@@ -253,11 +253,8 @@ export async function retryFailedItem(itemId: string): Promise<void> {
  */
 export async function getPendingCount(): Promise<number> {
   const db = await getDb();
-  const count = await db.syncQueue
-    .find({ selector: { status: 'pending' } })
-    .count()
-    .exec();
-  return count;
+  const items = await db.syncQueue.find({ selector: { status: 'pending' } }).exec();
+  return items.length;
 }
 
 /**
@@ -280,20 +277,15 @@ export async function getSyncStatus(): Promise<{
 }> {
   const db = await getDb();
 
-  const [pending, synced, failed] = await Promise.all([
-    db.syncQueue
-      .find({ selector: { status: 'pending' } })
-      .count()
-      .exec(),
-    db.syncQueue
-      .find({ selector: { status: 'synced' } })
-      .count()
-      .exec(),
-    db.syncQueue
-      .find({ selector: { status: 'failed' } })
-      .count()
-      .exec(),
+  const [pendingItems, syncedItems, failedItems] = await Promise.all([
+    db.syncQueue.find({ selector: { status: 'pending' } }).exec(),
+    db.syncQueue.find({ selector: { status: 'synced' } }).exec(),
+    db.syncQueue.find({ selector: { status: 'failed' } }).exec(),
   ]);
+
+  const pending = pendingItems.length;
+  const synced = syncedItems.length;
+  const failed = failedItems.length;
 
   const lastSyncedItem = await db.syncQueue
     .find({ selector: { status: 'synced' } })

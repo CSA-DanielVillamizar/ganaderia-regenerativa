@@ -7,6 +7,7 @@
 import { createRxDatabase, addRxPlugin } from 'rxdb';
 import type { RxDatabase, RxCollection } from 'rxdb';
 import { getRxStorageDexie } from 'rxdb/plugins/storage-dexie';
+import { RxDBQueryBuilderPlugin } from 'rxdb/plugins/query-builder';
 import {
   forageSchema,
   movementSchema,
@@ -15,6 +16,9 @@ import {
   herdSchema,
   paddockSchema,
 } from './schemas';
+
+// Registrar plugins necesarios
+addRxPlugin(RxDBQueryBuilderPlugin);
 
 /**
  * Tipos para las colecciones RxDB
