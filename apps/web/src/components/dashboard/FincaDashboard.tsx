@@ -7,6 +7,7 @@ import { OvergrazingAlert, OvergrazingAlertsResponseSchema } from '@ganaderia/sh
 import { SkeletonLoader } from '../common/SkeletonLoader';
 import { notificationService } from '@web/services/notification.service';
 import { authService } from '@web/services/auth.service';
+import { API_URL } from '@web/lib/api-config';
 
 interface FincaDashboardMetrics {
   totalActiveHerds: number;
@@ -44,44 +45,69 @@ export function FincaDashboard() {
       if (!token) {
         notificationService.error('Sesión no válida', 'auth-error');
         router.push('/auth/login');
+        setLoading(false);
         return;
       }
 
-      // Cargar alertas
-      const alertsResponse = await fetch('/api/v1/movements/alerts/overgrazing', {
+      /**
+       * Carga de alertas de sobrepastoreo desde la API backend.
+       * Se usa URL absoluta basada en `API_URL` para evitar 404 al resolver
+       * rutas relativas en el servidor de Next (puerto 3001) durante desarrollo.
+       */
+      const alertsResponse = await fetch(`${API_URL}/movements/alerts/overgrazing`, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
       });
 
-      if (alertsResponse.ok) {
-        const rawData = await alertsResponse.json();
-        const parseResult = OvergrazingAlertsResponseSchema.safeParse(rawData);
-
-        if (!parseResult.success) {
-          console.error('Schema validation error:', parseResult.error);
-          notificationService.error('Datos inválidos del servidor', 'schema-error');
-          return;
-        }
-
-        const alertsData = parseResult.data;
-        setAlerts(alertsData.data || []);
-
-        // Calcular métricas basadas en alertas validadas
-        const criticalCount = alertsData.criticalAlerts || 0;
-        const highCount = alertsData.highAlerts || 0;
-        const overallHealth = criticalCount > 0 ? 'CRITICAL' : highCount > 0 ? 'CAUTION' : 'GOOD';
-
-        setMetrics({
-          totalActiveHerds: alertsData.data?.length || 0,
-          paddocksAtRest: 0, // Se puede calcular desde otra fuente
-          activeMovements: alertsData.data?.length || 0,
-          overallHealth,
-        });
+      // Manejo de respuestas de autenticación
+      if (alertsResponse.status === 401 || alertsResponse.status === 403) {
+        notificationService.error('Sesión expirada', 'auth-error');
+        authService.logout();
+        router.push('/auth/login');
+        setLoading(false);
+        return;
       }
+
+      if (!alertsResponse.ok) {
+        const traceId = Math.random().toString(36).substring(7);
+        console.error(
+          `Error en endpoint: ${alertsResponse.status} ${alertsResponse.statusText}`,
+          traceId
+        );
+        notificationService.error(`Error al cargar alertas (${alertsResponse.status})`, traceId);
+        setLoading(false);
+        return;
+      }
+
+      const rawData = await alertsResponse.json();
+      const parseResult = OvergrazingAlertsResponseSchema.safeParse(rawData);
+
+      if (!parseResult.success) {
+        console.error('Schema validation error:', parseResult.error);
+        notificationService.error('Datos inválidos del servidor', 'schema-error');
+        setLoading(false);
+        return;
+      }
+
+      const alertsData = parseResult.data;
+      setAlerts(alertsData.data || []);
+
+      // Calcular métricas basadas en alertas validadas
+      const criticalCount = alertsData.criticalAlerts || 0;
+      const highCount = alertsData.highAlerts || 0;
+      const overallHealth = criticalCount > 0 ? 'CRITICAL' : highCount > 0 ? 'CAUTION' : 'GOOD';
+
+      setMetrics({
+        totalActiveHerds: alertsData.data?.length || 0,
+        paddocksAtRest: 0, // Se puede calcular desde otra fuente
+        activeMovements: alertsData.data?.length || 0,
+        overallHealth,
+      });
     } catch (error) {
       const traceId = Math.random().toString(36).substring(7);
+      console.error('Fetch error:', error, traceId);
       notificationService.error('Error al cargar dashboard', traceId);
       console.error('Dashboard error:', error);
     } finally {
