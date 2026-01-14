@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Download, X } from 'lucide-react';
+import { Download, X, Cow } from 'lucide-react';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -105,7 +105,7 @@ export default function InstallPrompt() {
         <div className="flex items-start gap-4">
           {/* Icono */}
           <div className="flex-shrink-0 w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-            <span className="text-2xl">🐄</span>
+            <Cow className="w-6 h-6 text-green-600" />
           </div>
 
           {/* Texto */}

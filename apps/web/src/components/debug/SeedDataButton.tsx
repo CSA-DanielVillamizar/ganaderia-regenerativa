@@ -1,12 +1,14 @@
 'use client';
 
 import React, { useState } from 'react';
-import { AlertCircle, CheckCircle2 } from 'lucide-react';
+import { AlertCircle, CheckCircle2, DatabaseZap } from 'lucide-react';
 import apiClient from '@/lib/api-client';
+import { clearAllCollections } from '@/lib/offline/db';
 
 /**
  * Botón de Carga de Datos de Prueba (Seed Data)
  * Llama al endpoint del backend para crear datos de prueba
+ * Limpia IndexedDB antes de cargar nuevos datos
  *
  * Crea:
  * - 3 Potreros: "El Roble", "La Ceiba", "Samán"
@@ -24,22 +26,32 @@ export default function SeedDataButton() {
     console.log('🚀🚀🚀 BOTÓN CLICKEADO - INICIANDO SEED DATA 🚀🚀🚀');
     try {
       setLoading(true);
-      setStatus({ type: 'loading', message: '🌱 Cargando datos de prueba...' });
+      setStatus({ type: 'loading', message: '🧹 Limpiando caché local...' });
 
+      // Primero: limpiar IndexedDB
+      console.log('[SeedDataButton] Limpiando IndexedDB...');
+      await clearAllCollections();
+      console.log('[SeedDataButton] ✅ IndexedDB limpiado');
+
+      setStatus({ type: 'loading', message: '🌱 Cargando datos de prueba desde servidor...' });
+
+      // Segundo: llamar al backend para crear seed data
       console.log('[SeedDataButton] Llamando al endpoint POST /api/seed/demo-data...');
-
-      // Llamar al backend para crear seed data
       const response = await apiClient.post('/seed/demo-data');
 
       console.log('[SeedDataButton] Respuesta del backend:', response.data);
 
       setStatus({
         type: 'success',
-        message: `✅ ¡Datos cargados! ${response.data.data.paddocks.length} potreros, 1 hato (${response.data.data.herd.numberOfAnimals} animales), 1 movimiento activo`,
+        message: `✅ ¡Datos cargados! ${response.data.data.paddocks.length} potreros, 1 hato (${response.data.data.herd.animalCount} animales), 1 movimiento activo`,
       });
 
-      // Recargar página después de 2 segundos
-      setTimeout(() => window.location.reload(), 2000);
+      // Recargar página después de 3 segundos para asegurar sincronización
+      console.log('[SeedDataButton] Recargando página en 3 segundos...');
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+
+      console.log('[SeedDataButton] 🔄 Recargando...');
+      window.location.href = '/dashboard';
     } catch (error) {
       const msg = error instanceof Error ? error.message : 'Error desconocido';
       console.error('[SeedDataButton] Error completo:', error);
@@ -55,8 +67,8 @@ export default function SeedDataButton() {
       <div className="bg-white border-2 border-yellow-400 rounded-lg shadow-lg p-4">
         {/* Header */}
         <div className="flex items-center gap-2 mb-3">
-          <span className="text-2xl">🌱</span>
-          <h3 className="font-semibold text-gray-900">Datos de Prueba</h3>
+          <DatabaseZap className="w-5 h-5 text-green-600" />
+          <h3 className="font-semibold text-gray-900">Cargar Datos Demo</h3>
         </div>
 
         {/* Status Message */}
@@ -95,14 +107,24 @@ export default function SeedDataButton() {
         <button
           onClick={loadSeedData}
           disabled={loading || status.type === 'loading'}
-          className="w-full px-4 py-2 bg-yellow-500 hover:bg-yellow-600 disabled:bg-gray-400 text-white font-semibold rounded-lg transition-colors duration-200"
+          className="w-full px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-semibold rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
         >
-          {loading ? '⏳ Cargando...' : '🌱 Cargar Datos Demo'}
+          {loading ? (
+            <>
+              <div className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
+              Cargando...
+            </>
+          ) : (
+            <>
+              <DatabaseZap className="w-4 h-4" />
+              Cargar Datos Demo
+            </>
+          )}
         </button>
 
         {/* Warning */}
         <p className="text-xs text-gray-500 mt-3 italic">
-          ⚠️ Solo para desarrollo. Elimina antes de producción.
+          Solo para desarrollo. Elimina antes de producción.
         </p>
       </div>
     </div>

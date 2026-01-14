@@ -39,7 +39,7 @@ export default function KpiGrid({ kpis, isLoading = false }: KpiGridProps) {
       value: kpis.globalStockingRate.toFixed(2),
       unit: 'UA/ha',
       color: isOverloaded ? 'red' : 'green',
-      alert: isOverloaded ? '⚠️ Sobrecarga' : '✅ Óptima',
+      alert: isOverloaded ? 'Sobrecarga' : 'Óptima',
       bgColor: isOverloaded ? 'bg-red-50' : 'bg-green-50',
       borderColor: isOverloaded ? 'border-red-300' : 'border-green-300',
       textColor: isOverloaded ? 'text-red-700' : 'text-green-700',

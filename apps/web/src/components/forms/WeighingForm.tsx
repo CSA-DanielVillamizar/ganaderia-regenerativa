@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Target } from 'lucide-react';
 import { CreateWeighingDto, CreateWeighingDtoSchema } from '@ganaderia/shared';
 import { weighingService } from '@web/services/api.service';
 
@@ -227,7 +228,7 @@ export default function WeighingForm({
                   </div>
                   <div className="text-3xl font-bold text-green-900">{estimatedWeight} kg</div>
                 </div>
-                <div className="text-4xl">🎯</div>
+                <Target className="w-10 h-10 text-green-600" />
               </div>
               <div className="mt-2 text-xs text-green-600">
                 Peso total del lote:{' '}

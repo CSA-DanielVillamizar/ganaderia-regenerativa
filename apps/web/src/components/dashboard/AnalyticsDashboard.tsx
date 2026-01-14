@@ -10,7 +10,7 @@ import {
   type PastureWedgeItem,
   type WeightGainReport,
 } from '@/services/analytics.service';
-import { Loader } from 'lucide-react';
+import { Loader, RotateCw, Sprout, CheckCircle2, AlertCircle } from 'lucide-react';
 
 /**
  * Dashboard Mejorado con Análisis Agronómico Voisin
@@ -35,7 +35,6 @@ export default function AnalyticsDashboard() {
         setIsLoading(true);
         setError(null);
 
-        // Cargar todos los datos en paralelo
         const [kpisData, wedgeData, weightsData] = await Promise.all([
           getGlobalKPIs(),
           getPastureWedge(),
@@ -55,7 +54,7 @@ export default function AnalyticsDashboard() {
 
     loadData();
 
-    // Recargar datos cada 30 segundos (para mantener datos frescos)
+    // Recargar datos cada 30 segundos
     const interval = setInterval(loadData, 30000);
     return () => clearInterval(interval);
   }, []);
@@ -101,26 +100,34 @@ export default function AnalyticsDashboard() {
           <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Insight 1: Rotación */}
             <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-6">
-              <h3 className="text-lg font-bold text-blue-900 mb-2">🔄 Rotación</h3>
+              <h3 className="text-lg font-bold text-blue-900 mb-2 flex items-center gap-2">
+                <RotateCw className="w-5 h-5" />
+                Rotación
+              </h3>
               <p className="text-sm text-blue-800">
                 {wedge.filter((p) => p.restStatus === 'OPTIMAL').length} potreros listos para
                 cosecha (45-60 días de descanso).
               </p>
               {kpis && kpis.globalStockingRate > 4 && (
-                <p className="text-sm text-red-700 font-semibold mt-2">
-                  ⚠️ Carga global elevada. Considera aumentar área o reducir lote.
+                <p className="text-sm text-red-700 font-semibold mt-2 flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4" />
+                  Carga global elevada. Considera aumentar área o reducir lote.
                 </p>
               )}
             </div>
 
             {/* Insight 2: Forraje */}
             <div className="bg-green-50 border-2 border-green-300 rounded-lg p-6">
-              <h3 className="text-lg font-bold text-green-900 mb-2">🌾 Disponibilidad</h3>
+              <h3 className="text-lg font-bold text-green-900 mb-2 flex items-center gap-2">
+                <Sprout className="w-5 h-5" />
+                Disponibilidad
+              </h3>
               <p className="text-sm text-green-800">
                 Descanso promedio: {kpis?.averageRestDays} días.
                 {kpis && kpis.averageRestDays >= 45 && (
-                  <span className="block mt-2 text-green-700 font-semibold">
-                    ✅ Excelente cumplimiento de Voisin
+                  <span className="block mt-2 text-green-700 font-semibold flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4" />
+                    Excelente cumplimiento de Voisin
                   </span>
                 )}
               </p>

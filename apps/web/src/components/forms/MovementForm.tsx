@@ -11,7 +11,7 @@ import {
   type RestStatus,
   type ForageBalance,
 } from '@/lib/agronomy/calculations';
-import { Loader, AlertTriangle, CheckCircle, Info } from 'lucide-react';
+import { Loader, AlertTriangle, CheckCircle, Info, Sprout, BarChart3 } from 'lucide-react';
 
 interface Paddock {
   id: string;
@@ -173,7 +173,7 @@ export default function MovementForm({
       {/* Header */}
       <div className="bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-300 rounded-lg p-4">
         <div className="flex items-center gap-3">
-          <div className="text-3xl">🌱</div>
+          <Sprout className="w-8 h-8 text-green-600" />
           <div>
             <h3 className="font-bold text-green-900">Asistente Voisin</h3>
             <p className="text-sm text-green-700">
@@ -337,7 +337,9 @@ export default function MovementForm({
       {/* BALANCE FORRAJERO */}
       {forageBalance && (
         <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-4 space-y-3">
-          <h4 className="font-semibold text-blue-900">📊 Balance Forrajero</h4>
+          <h4 className="font-semibold text-blue-900 flex items-center gap-2">
+            <BarChart3 className="w-4 h-4" /> Balance Forrajero
+          </h4>
 
           <div className="grid grid-cols-2 gap-3 text-sm">
             <div>
@@ -378,7 +380,8 @@ export default function MovementForm({
           {forageBalance.status === 'DEFICIT' && (
             <div className="bg-red-100 border border-red-300 rounded p-2">
               <p className="text-sm text-red-800 font-semibold">
-                ⚠️ DÉFICIT FORRAJERO: No hay suficiente pasto para el lote
+                <AlertTriangle className="w-4 h-4 inline mr-1" />
+                DÉFICIT FORRAJERO: No hay suficiente pasto para el lote
               </p>
             </div>
           )}

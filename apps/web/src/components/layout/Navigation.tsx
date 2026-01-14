@@ -4,7 +4,16 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useLogout } from '@web/hooks/useAuth';
 import { Button } from '@web/components/common/Button';
-import { LogOut, Leaf, Beef, BarChart3, MoveRight, Grid3x3, HelpCircle } from 'lucide-react';
+import {
+  LogOut,
+  Leaf,
+  Beef,
+  BarChart3,
+  MoveRight,
+  Grid3x3,
+  HelpCircle,
+  Sprout,
+} from 'lucide-react';
 import FieldGuideViewer from '@web/components/common/FieldGuideViewer';
 import { FarmSwitcher } from './FarmSwitcher';
 import { OfflineIndicator } from './OfflineIndicator';
@@ -24,7 +33,10 @@ export function Sidebar() {
   return (
     <div className="bg-green-800 text-white w-64 min-h-screen p-6 fixed hidden lg:block">
       <div className="mb-8">
-        <h2 className="text-2xl font-bold">🐄 Magrotec</h2>
+        <div className="flex items-center gap-2 mb-2">
+          <Leaf className="w-6 h-6 text-green-300" />
+          <h2 className="text-2xl font-bold">Magrotec</h2>
+        </div>
         <p className="text-green-200 text-xs mt-1">Ganadería Regenerativa</p>
         <div className="mt-4">
           <FarmSwitcher />

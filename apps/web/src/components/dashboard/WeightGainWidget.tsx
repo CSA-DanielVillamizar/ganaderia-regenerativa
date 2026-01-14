@@ -195,7 +195,10 @@ export default function WeightGainWidget({ reports, isLoading = false }: WeightG
       {globalStatus === 'ALERT' && (
         <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
           <p className="text-sm text-red-800">
-            <strong>⚠️ Recomendación:</strong> La ganancia de peso está por debajo de lo esperado.
+            <strong className="flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4" /> Recomendación:
+            </strong>{' '}
+            <span>La ganancia de peso está por debajo de lo esperado.</span>
             Revisa:
             <ul className="mt-2 ml-4 space-y-1 list-disc text-xs">
               <li>Calidad nutricional del pasto</li>

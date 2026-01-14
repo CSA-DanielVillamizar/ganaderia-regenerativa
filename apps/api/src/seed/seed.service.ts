@@ -10,6 +10,7 @@ export class SeedService {
 
   /**
    * Crea datos de prueba para una finca
+   * PRIMERO limpia todos los datos existentes de esa finca
    */
   async createDemoData(farmId?: string) {
     const now = new Date();
@@ -21,13 +22,71 @@ export class SeedService {
       });
 
       if (!farm) {
-        throw new Error(
-          'No hay fincas disponibles. Crea una finca primero.',
-        );
+        throw new Error('No hay fincas disponibles. Crea una finca primero.');
       }
 
       farmId = farm.id;
     }
+
+    // ⚠️ LIMPIAR PRIMERO: Eliminar todos los datos existentes de esta finca
+    console.log(`🧹 Limpiando datos existentes de la finca ${farmId}...`);
+
+    // Primero movimientos (dependen de herdos y potreros)
+    await this.prisma.movement.deleteMany({
+      where: {
+        paddock: {
+          farmId,
+        },
+      },
+    });
+
+    // Pesajes (dependen de hatos)
+    await this.prisma.weighing.deleteMany({
+      where: {
+        herd: {
+          farmId,
+        },
+      },
+    });
+
+    // Ciclos (dependen de hatos)
+    await this.prisma.cycle.deleteMany({
+      where: {
+        herd: {
+          farmId,
+        },
+      },
+    });
+
+    // Muestras de forraje (necesitan paddockId o filtro por finca)
+    const paddocksToDelete = await this.prisma.paddock.findMany({
+      where: { farmId },
+      select: { id: true },
+    });
+
+    if (paddocksToDelete.length > 0) {
+      await this.prisma.forageSample.deleteMany({
+        where: {
+          paddockId: { in: paddocksToDelete.map((p) => p.id) },
+        },
+      });
+    }
+
+    // Hatos/Lotes
+    await this.prisma.herd.deleteMany({
+      where: {
+        farmId,
+      },
+    });
+
+    // Potreros
+    await this.prisma.paddock.deleteMany({
+      where: {
+        farmId,
+      },
+    });
+
+    console.log(`✅ Datos de la finca limpiados`);
 
     // 1. Crear 3 potreros
     const paddocks = await this.prisma.$transaction([
@@ -78,7 +137,7 @@ export class SeedService {
       data: {
         herdId: herd.id,
         paddockId: paddocks[2].id, // Samán
-        type: 'ROTATION', // Tipo de movimiento
+        type: 'ROTATION',
         entryDate: now,
         status: 'ACTIVE',
       },
@@ -87,7 +146,7 @@ export class SeedService {
     return {
       success: true,
       data: {
-        paddocks: paddocks.map((p: any) => ({ id: p.id, name: p.name })),
+        paddocks: paddocks.map((p) => ({ id: p.id, name: p.name })),
         herd: { id: herd.id, name: herd.name, animalCount: herd.animalCount },
         movement: { id: movement.id, paddockName: paddocks[2].name },
       },

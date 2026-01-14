@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Wheat, Target } from 'lucide-react';
 import { CreateForageSampleDto, CreateForageSampleDtoSchema } from '@ganaderia/shared';
 import { forageService } from '@web/services/api.service';
 
@@ -111,7 +112,9 @@ export default function ForageForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-        <h3 className="font-semibold text-green-900 mb-1">🌾 Aforo Forrajero Guiado</h3>
+        <h3 className="font-semibold text-green-900 mb-1 flex items-center gap-2">
+          <Wheat className="w-4 h-4" /> Aforo Forrajero Guiado
+        </h3>
         <p className="text-sm text-green-700">
           Potrero: <span className="font-medium">{paddockName}</span> • {paddockHectares} ha
         </p>
@@ -288,7 +291,7 @@ export default function ForageForm({
                 {kgMSPerHa.toLocaleString()} kg MS/ha
               </div>
             </div>
-            <div className="text-5xl">🎯</div>
+            <Target className="w-12 h-12 text-green-600" />
           </div>
 
           <div className="grid grid-cols-2 gap-4 pt-4 border-t border-green-300">

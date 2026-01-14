@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { X, AlertTriangle, CheckCircle2, Info } from 'lucide-react';
+import { X, AlertTriangle, CheckCircle2, Info, Ban, Leaf, Scissors } from 'lucide-react';
 
 export interface FieldGuideViewerProps {
   open: boolean;
@@ -11,7 +11,10 @@ export interface FieldGuideViewerProps {
 /**
  * Modal de Guía de Campo rápida (Semáforo Voisin + Glosario + Tips)
  */
-export default function FieldGuideViewer({ open, onClose }: FieldGuideViewerProps): React.ReactNode {
+export default function FieldGuideViewer({
+  open,
+  onClose,
+}: FieldGuideViewerProps): React.ReactNode {
   if (!open) return null;
 
   return (
@@ -93,9 +96,7 @@ export default function FieldGuideViewer({ open, onClose }: FieldGuideViewerProp
                 Mantén ocupación corta (≤3 días) y alta densidad para mejorar distribución de
                 estiércol y pisoteo controlado.
               </li>
-              <li>
-                Usa aforo reciente para ajustar carga: oferta vs demanda en kg MS.
-              </li>
+              <li>Usa aforo reciente para ajustar carga: oferta vs demanda en kg MS.</li>
               <li>
                 Revisa UA/ha: si supera 4 de forma sostenida, considera ampliar área o dividir lote.
               </li>
@@ -123,10 +124,20 @@ function Card({
     orange: 'border-orange-200 bg-orange-50 text-orange-800',
   };
 
+  const iconMap: Record<typeof color, React.ReactNode> = {
+    red: <Ban className="w-5 h-5 text-red-600" />,
+    yellow: <AlertTriangle className="w-5 h-5 text-yellow-600" />,
+    green: <Leaf className="w-5 h-5 text-green-600" />,
+    orange: <Scissors className="w-5 h-5 text-orange-600" />,
+  };
+
   return (
     <div className={`border rounded-lg p-3 ${styles[color]}`}>
-      <p className="font-semibold">{title}</p>
-      <p className="text-sm mt-1 leading-5">{children}</p>
+      <p className="font-semibold flex items-center gap-2">
+        {iconMap[color]}
+        {title}
+      </p>
+      <p className="text-sm mt-1 leading-5 ml-7">{children}</p>
     </div>
   );
 }

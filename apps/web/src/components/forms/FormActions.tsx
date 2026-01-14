@@ -30,7 +30,7 @@ export function FormActions({
         disabled={isLoading || isSaveDisabled}
         className="flex-1 bg-green-600 text-white py-2 rounded-md font-medium hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
       >
-        {isLoading ? '⏳ Guardando...' : saveLabel}
+        {isLoading ? 'Guardando...' : saveLabel}
       </button>
 
       <Link

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Plus } from 'lucide-react';
+import { Plus, LayoutDashboard } from 'lucide-react';
 import AnalyticsDashboard from '@web/components/dashboard/AnalyticsDashboard';
 import SeedDataButton from '@web/components/debug/SeedDataButton';
 import { Button } from '@web/components/common/Button';
@@ -22,7 +22,7 @@ export default function DashboardPage(): React.ReactNode {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
-              <span className="text-4xl">📊</span>
+              <LayoutDashboard className="w-8 h-8 text-green-700" />
               Dashboard Agronómico
             </h1>
             <p className="text-sm text-gray-600">

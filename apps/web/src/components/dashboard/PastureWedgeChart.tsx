@@ -12,6 +12,7 @@ import {
   ReferenceLine,
   ResponsiveContainer,
 } from 'recharts';
+import { Wheat, AlertTriangle } from 'lucide-react';
 import { type PastureWedgeItem } from '@/services/analytics.service';
 
 interface PastureWedgeChartProps {
@@ -76,7 +77,7 @@ export default function PastureWedgeChart({ data, isLoading = false }: PastureWe
       const statusLabel = {
         INSUFFICIENT: '⛔ Insuficiente',
         ADEQUATE: '🟡 Aceptable',
-        OPTIMAL: '✅ Óptimo',
+        OPTIMAL: 'Óptimo',
         EXCESSIVE: '🟠 Excesivo',
       };
 
@@ -103,7 +104,7 @@ export default function PastureWedgeChart({ data, isLoading = false }: PastureWe
       {/* Header */}
       <div className="mb-6">
         <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-          <span className="text-2xl">🌾</span>
+          <Wheat className="w-6 h-6 text-yellow-600" />
           Cuña Forrajera (Pasture Wedge)
         </h3>
         <p className="text-sm text-gray-600 mt-2">
@@ -189,7 +190,8 @@ export default function PastureWedgeChart({ data, isLoading = false }: PastureWe
           {data.filter((p) => p.restStatus === 'INSUFFICIENT').length > 0 && (
             <>
               {' '}
-              ⚠️ {data.filter((p) => p.restStatus === 'INSUFFICIENT').length} tienen descanso
+              <AlertTriangle className="w-4 h-4 inline mr-1" />
+              {data.filter((p) => p.restStatus === 'INSUFFICIENT').length} tienen descanso
               insuficiente.
             </>
           )}
