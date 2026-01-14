@@ -241,19 +241,19 @@ export class ExportService {
     const title = `Reporte de Ciclo: ${cycle.herd.name}`;
     const summary = {
       'ID Ciclo': cycle.id,
-      'Finca': cycle.farm.name,
-      'Rebaño': cycle.herd.name,
-      'Animales': cycle.herd.animals.length,
-      'Inicio': cycle.startDate.toLocaleDateString('es-ES'),
-      'Fin': cycle.endDate?.toLocaleDateString('es-ES') || 'En progreso',
-      'Estado': cycle.status,
+      Finca: cycle.farm.name,
+      Rebaño: cycle.herd.name,
+      Animales: cycle.herd.animals.length,
+      Inicio: cycle.startDate.toLocaleDateString('es-ES'),
+      Fin: cycle.endDate?.toLocaleDateString('es-ES') || 'En progreso',
+      Estado: cycle.status,
     };
 
     const movementsData = cycle.movements.map((m: any) => ({
-      'Potrero': m.paddock.name,
-      'Entrada': m.entryDate.toLocaleDateString('es-ES'),
-      'Salida': m.exitDate?.toLocaleDateString('es-ES') || 'Activo',
-      'Días': m.exitDate
+      Potrero: m.paddock.name,
+      Entrada: m.entryDate.toLocaleDateString('es-ES'),
+      Salida: m.exitDate?.toLocaleDateString('es-ES') || 'Activo',
+      Días: m.exitDate
         ? Math.floor((m.exitDate.getTime() - m.entryDate.getTime()) / (1000 * 60 * 60 * 24))
         : 'En ocupación',
     }));
@@ -273,16 +273,17 @@ export class ExportService {
     const title = 'Reporte de Pesajes';
 
     const weighingData = weighings.map((w: any) => ({
-      'Animal': w.animal.id,
-      'Rebaño': w.animal.herd.name,
+      Animal: w.animal.id,
+      Rebaño: w.animal.herd.name,
       'Peso (kg)': w.weightKg,
-      'Fecha': w.createdAt.toLocaleDateString('es-ES'),
-      'Observaciones': w.notes || '-',
+      Fecha: w.createdAt.toLocaleDateString('es-ES'),
+      Observaciones: w.notes || '-',
     }));
 
     // Calcular estadísticas
     const weights = weighings.map((w: any) => w.weightKg);
-    const avgWeight = weights.length > 0 ? weights.reduce((a: number, b: number) => a + b) / weights.length : 0;
+    const avgWeight =
+      weights.length > 0 ? weights.reduce((a: number, b: number) => a + b) / weights.length : 0;
     const minWeight = Math.min(...weights);
     const maxWeight = Math.max(...weights);
 
@@ -309,27 +310,31 @@ export class ExportService {
     const title = 'Reporte de Movimientos de Ganado';
 
     const movementData = movements.map((m: any) => ({
-      'Rebaño': m.herd.name,
-      'Potrero': m.paddock.name,
-      'Entrada': m.entryDate.toLocaleDateString('es-ES'),
-      'Salida': m.exitDate?.toLocaleDateString('es-ES') || 'Activo',
+      Rebaño: m.herd.name,
+      Potrero: m.paddock.name,
+      Entrada: m.entryDate.toLocaleDateString('es-ES'),
+      Salida: m.exitDate?.toLocaleDateString('es-ES') || 'Activo',
       'Días Ocupados': m.exitDate
         ? Math.floor((m.exitDate.getTime() - m.entryDate.getTime()) / (1000 * 60 * 60 * 24))
         : 'En ocupación',
-      'Estado': m.exitDate ? 'Completado' : 'Activo',
+      Estado: m.exitDate ? 'Completado' : 'Activo',
     }));
 
     // Estadísticas
     const completedMovements = movements.filter((m: any) => m.exitDate);
-    const avgOccupancy = completedMovements.length > 0
-      ? completedMovements.reduce((sum: number, m: any) => {
-          return sum + Math.floor((m.exitDate.getTime() - m.entryDate.getTime()) / (1000 * 60 * 60 * 24));
-        }, 0) / completedMovements.length
-      : 0;
+    const avgOccupancy =
+      completedMovements.length > 0
+        ? completedMovements.reduce((sum: number, m: any) => {
+            return (
+              sum +
+              Math.floor((m.exitDate.getTime() - m.entryDate.getTime()) / (1000 * 60 * 60 * 24))
+            );
+          }, 0) / completedMovements.length
+        : 0;
 
     const statistics = {
       'Total Movimientos': movements.length,
-      'Completados': completedMovements.length,
+      Completados: completedMovements.length,
       'En Progreso': movements.length - completedMovements.length,
       'Ocupación Promedio (días)': avgOccupancy.toFixed(1),
       'Potreros Utilizados': new Set(movements.map((m: any) => m.paddock.id)).size,
@@ -350,17 +355,18 @@ export class ExportService {
     const title = 'Reporte de Aforos de Forraje';
 
     const forageData = forageSamples.map((f: any) => ({
-      'Potrero': f.paddock.name,
+      Potrero: f.paddock.name,
       'MS (kg/ha)': f.kgMSPerHa,
       'CP %': f.cpPercent || '-',
       'IVMS %': f.ivmsPercent || '-',
-      'Fecha': f.createdAt.toLocaleDateString('es-ES'),
-      'Notas': f.notes || '-',
+      Fecha: f.createdAt.toLocaleDateString('es-ES'),
+      Notas: f.notes || '-',
     }));
 
     // Estadísticas
     const msValues = forageSamples.map((f: any) => f.kgMSPerHa || 0).filter((v: number) => v > 0);
-    const avgMS = msValues.length > 0 ? msValues.reduce((a: number, b: number) => a + b) / msValues.length : 0;
+    const avgMS =
+      msValues.length > 0 ? msValues.reduce((a: number, b: number) => a + b) / msValues.length : 0;
 
     const statistics = {
       'Total Aforos': forageSamples.length,
@@ -427,14 +433,13 @@ export class ExportService {
         const headers = Object.keys(section.data[0]);
         csvContent += headers.map((h: string) => `"${h}"`).join(',') + '\n';
         for (const row of section.data) {
-          csvContent += headers
-            .map((h: string) => {
-              const value = row[h] || '';
-              return typeof value === 'string' && value.includes(',')
-                ? `"${value}"`
-                : value;
-            })
-            .join(',') + '\n';
+          csvContent +=
+            headers
+              .map((h: string) => {
+                const value = row[h] || '';
+                return typeof value === 'string' && value.includes(',') ? `"${value}"` : value;
+              })
+              .join(',') + '\n';
         }
       }
       csvContent += '\n';
@@ -540,6 +545,71 @@ export class ExportService {
     return {
       filename,
       mimeType: 'application/json',
+      buffer,
+      size: buffer.length,
+    };
+  }
+
+  /**
+   * Generar CSV de movimientos (REPORTES - Feature B)
+   * Incluye: Fecha Entrada, Fecha Salida, Hato, Potrero, Días Ocupación
+   */
+  async generateMovementsCsv(farmId: string, userId: string): Promise<ExportResult> {
+    // Verificar acceso
+    const userFarm = await this.prisma.userFarm.findUnique({
+      where: { userId_farmId: { userId, farmId } },
+    });
+
+    if (!userFarm) {
+      throw new BadRequestException('No tienes acceso a esta finca');
+    }
+
+    // Consultar movimientos
+    const movements = await this.prisma.movement.findMany({
+      where: { herd: { farmId } },
+      include: {
+        herd: true,
+        paddock: true,
+      },
+      orderBy: { entryDate: 'desc' },
+    });
+
+    // Construir CSV
+    const csvRows: string[] = [];
+    csvRows.push('Fecha Entrada,Fecha Salida,Hato,Potrero,Días Ocupación,Estado');
+
+    movements.forEach((movement) => {
+      const entryDate = movement.entryDate.toISOString().split('T')[0];
+      const exitDate = movement.exitDate
+        ? movement.exitDate.toISOString().split('T')[0]
+        : 'En curso';
+      const herdName = movement.herd.name;
+      const paddockName = movement.paddock.name;
+
+      let daysOccupied = 0;
+      if (movement.exitDate) {
+        daysOccupied = Math.floor(
+          (movement.exitDate.getTime() - movement.entryDate.getTime()) / (1000 * 60 * 60 * 24)
+        );
+      } else {
+        daysOccupied = Math.floor(
+          (new Date().getTime() - movement.entryDate.getTime()) / (1000 * 60 * 60 * 24)
+        );
+      }
+
+      const status = movement.status === 'ACTIVE' ? 'Activo' : 'Cerrado';
+
+      csvRows.push(`${entryDate},${exitDate},${herdName},${paddockName},${daysOccupied},${status}`);
+    });
+
+    const csvContent = csvRows.join('\n');
+    const buffer = Buffer.from('\ufeff' + csvContent, 'utf-8'); // BOM para Excel
+    const timestamp = new Date().toISOString().split('T')[0];
+    const filename = `Movimientos_${farmId}_${timestamp}.csv`;
+
+    return {
+      filename,
+      mimeType: 'text/csv;charset=utf-8',
       buffer,
       size: buffer.length,
     };

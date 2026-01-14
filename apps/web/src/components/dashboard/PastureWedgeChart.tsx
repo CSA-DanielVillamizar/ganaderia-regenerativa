@@ -54,45 +54,61 @@ export default function PastureWedgeChart({ data, isLoading = false }: PastureWe
     );
   }
 
-  // Preparar datos para gráfico
-  const chartData = data.map((item) => ({
-    name: item.paddockName,
-    days: item.daysSinceExit === 999 ? 0 : item.daysSinceExit,
-    fill:
-      item.color === 'red'
-        ? '#ef4444'
-        : item.color === 'yellow'
-          ? '#eab308'
-          : item.color === 'green'
-            ? '#22c55e'
-            : '#f97316',
-    status: item.restStatus,
-    hectares: item.hectares,
-  }));
+  // Preparar datos para gráfico con colores mejorados
+  const chartData = data.map((item) => {
+    const days = item.daysSinceExit === 999 ? 0 : item.daysSinceExit;
 
-  // Custom tooltip
+    // Colores dinámicos mejorados para mejor visualización
+    let fillColor: string;
+    let statusLabel: string;
+
+    if (days < 21) {
+      fillColor = '#ef4444'; // Rojo intenso - sobrepastoreado/sin descanso
+      statusLabel = '⛔ Insuficiente';
+    } else if (days >= 21 && days < 30) {
+      fillColor = '#fb923c'; // Naranja - aún en descanso corto
+      statusLabel = '🟠 Corto';
+    } else if (days >= 30 && days < 45) {
+      fillColor = '#fbbf24'; // Amarillo - descanso aceptable
+      statusLabel = '🟡 Aceptable';
+    } else if (days >= 45 && days <= 60) {
+      fillColor = '#22c55e'; // Verde - óptimo para pastoreo
+      statusLabel = '✅ Listo';
+    } else {
+      fillColor = '#8b5cf6'; // Púrpura - descanso excesivo
+      statusLabel = '🟣 Excesivo';
+    }
+
+    return {
+      name: item.paddockName,
+      days,
+      fill: fillColor,
+      statusLabel,
+      status: item.restStatus,
+      hectares: item.hectares,
+    };
+  });
+
+  // Custom tooltip mejorado
   const CustomTooltip = (props: any) => {
     if (props.active && props.payload && props.payload[0]) {
       const data = props.payload[0].payload;
-      const statusLabel = {
-        INSUFFICIENT: '⛔ Insuficiente',
-        ADEQUATE: '🟡 Aceptable',
-        OPTIMAL: 'Óptimo',
-        EXCESSIVE: '🟠 Excesivo',
-      };
 
       return (
-        <div className="bg-white p-3 border-2 border-gray-300 rounded-lg shadow-lg">
-          <p className="font-semibold text-gray-800">{data.name}</p>
-          <p className="text-sm text-gray-600">
-            <strong>Descanso:</strong> {data.days} días
-          </p>
-          <p className="text-sm text-gray-600">
-            <strong>Tamaño:</strong> {data.hectares} ha
-          </p>
-          <p className="text-sm">
-            <strong>{statusLabel[data.status as keyof typeof statusLabel]}</strong>
-          </p>
+        <div className="bg-white p-4 border-2 border-gray-300 rounded-lg shadow-xl">
+          <p className="font-bold text-gray-900 text-base mb-2">{data.name}</p>
+          <div className="space-y-1">
+            <p className="text-sm text-gray-700">
+              <strong>Descanso:</strong>{' '}
+              <span className="text-blue-600 font-semibold">{data.days} días</span>
+            </p>
+            <p className="text-sm text-gray-700">
+              <strong>Tamaño:</strong> {data.hectares} ha
+            </p>
+            <p className="text-sm mt-2 px-2 py-1 bg-gray-100 rounded">
+              <strong>{data.statusLabel}</strong>
+            </p>
+          </div>
         </div>
       );
     }
@@ -162,23 +178,29 @@ export default function PastureWedgeChart({ data, isLoading = false }: PastureWe
         </BarChart>
       </ResponsiveContainer>
 
-      {/* Leyenda */}
-      <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg">
+      {/* Leyenda mejorada con nuevos colores */}
+      <div className="mt-6 grid grid-cols-2 md:grid-cols-5 gap-3 p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg border border-gray-200">
         <div className="flex items-center gap-2">
-          <div className="w-4 h-4 bg-red-500 rounded" />
-          <span className="text-sm text-gray-700">Insuficiente (&lt;30 d)</span>
+          <div className="w-5 h-5 bg-red-500 rounded-md shadow" />
+          <span className="text-xs md:text-sm text-gray-800 font-medium">
+            Insuficiente (&lt;21d)
+          </span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-4 h-4 bg-yellow-500 rounded" />
-          <span className="text-sm text-gray-700">Aceptable (30-45 d)</span>
+          <div className="w-5 h-5 bg-orange-400 rounded-md shadow" />
+          <span className="text-xs md:text-sm text-gray-800 font-medium">Corto (21-30d)</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-4 h-4 bg-green-500 rounded" />
-          <span className="text-sm text-gray-700">Óptimo (45-60 d)</span>
+          <div className="w-5 h-5 bg-yellow-400 rounded-md shadow" />
+          <span className="text-xs md:text-sm text-gray-800 font-medium">Aceptable (30-45d)</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-4 h-4 bg-orange-500 rounded" />
-          <span className="text-sm text-gray-700">Excesivo (&gt;60 d)</span>
+          <div className="w-5 h-5 bg-green-500 rounded-md shadow" />
+          <span className="text-xs md:text-sm text-gray-800 font-medium">Listo (45-60d)</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-5 h-5 bg-purple-500 rounded-md shadow" />
+          <span className="text-xs md:text-sm text-gray-800 font-medium">Excesivo (&gt;60d)</span>
         </div>
       </div>
 

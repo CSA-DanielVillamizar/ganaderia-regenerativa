@@ -77,7 +77,7 @@ export class ExportController {
     @Request() req: any,
     @Res() res: Response,
     @Query('startDate') startDate?: string,
-    @Query('endDate') endDate?: string,
+    @Query('endDate') endDate?: string
   ) {
     if (!farmId) {
       throw new BadRequestException('farmId es requerido');
@@ -90,7 +90,9 @@ export class ExportController {
     const options: ExportOptions = {
       format: format as ExportFormat,
       dateRange: {
-        startDate: startDate ? new Date(startDate) : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+        startDate: startDate
+          ? new Date(startDate)
+          : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
         endDate: endDate ? new Date(endDate) : new Date(),
       },
     };
@@ -123,7 +125,7 @@ export class ExportController {
     @Request() req: any,
     @Res() res: Response,
     @Query('startDate') startDate?: string,
-    @Query('endDate') endDate?: string,
+    @Query('endDate') endDate?: string
   ) {
     if (!farmId) {
       throw new BadRequestException('farmId es requerido');
@@ -136,7 +138,9 @@ export class ExportController {
     const options: ExportOptions = {
       format: format as ExportFormat,
       dateRange: {
-        startDate: startDate ? new Date(startDate) : new Date(Date.now() - 90 * 24 * 60 * 60 * 1000),
+        startDate: startDate
+          ? new Date(startDate)
+          : new Date(Date.now() - 90 * 24 * 60 * 60 * 1000),
         endDate: endDate ? new Date(endDate) : new Date(),
       },
     };
@@ -169,7 +173,7 @@ export class ExportController {
     @Request() req: any,
     @Res() res: Response,
     @Query('startDate') startDate?: string,
-    @Query('endDate') endDate?: string,
+    @Query('endDate') endDate?: string
   ) {
     if (!farmId) {
       throw new BadRequestException('farmId es requerido');
@@ -182,12 +186,39 @@ export class ExportController {
     const options: ExportOptions = {
       format: format as ExportFormat,
       dateRange: {
-        startDate: startDate ? new Date(startDate) : new Date(Date.now() - 90 * 24 * 60 * 60 * 1000),
+        startDate: startDate
+          ? new Date(startDate)
+          : new Date(Date.now() - 90 * 24 * 60 * 60 * 1000),
         endDate: endDate ? new Date(endDate) : new Date(),
       },
     };
 
     const result = await this.exportService.exportForageReport(farmId, req.user.id, options);
+
+    res.setHeader('Content-Type', result.mimeType);
+    res.setHeader('Content-Disposition', `attachment; filename="${result.filename}"`);
+    res.setHeader('Content-Length', result.size);
+
+    res.send(result.buffer);
+  }
+
+  /**
+   * Exportar movimientos como CSV (REPORTES - Feature B)
+   * GET /export/movements-csv/:farmId
+   */
+  @Get('movements-csv/:farmId')
+  @ApiOperation({
+    summary: 'Exportar movimientos a CSV',
+    description:
+      'Genera archivo CSV con todos los movimientos de la finca: Fecha Entrada, Fecha Salida, Hato, Potrero, Días Ocupación',
+  })
+  @ApiParam({ name: 'farmId', description: 'ID de la finca' })
+  async exportMovementsCsv(
+    @Param('farmId') farmId: string,
+    @Request() req: any,
+    @Res() res: Response
+  ) {
+    const result = await this.exportService.generateMovementsCsv(farmId, req.user.id);
 
     res.setHeader('Content-Type', result.mimeType);
     res.setHeader('Content-Disposition', `attachment; filename="${result.filename}"`);

@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Get,
-  UseGuards,
-  Request,
-  Query,
-  Param,
-} from '@nestjs/common';
+import { Controller, Get, UseGuards, Request, Query, Param } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { DashboardService } from './dashboard.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -33,7 +26,11 @@ export class DashboardController {
   @ApiResponse({ status: 401, description: 'No autenticado' })
   @ApiResponse({ status: 403, description: 'Acceso denegado a la finca' })
   @ApiResponse({ status: 500, description: 'Error interno del servidor' })
-  getTrends(@Query('farmId') farmId: string, @Query('herdId') herdId?: string, @Request() req?: any) {
+  getTrends(
+    @Query('farmId') farmId: string,
+    @Query('herdId') herdId?: string,
+    @Request() req?: any
+  ) {
     return this.dashboardService.getTrends(farmId, req.user.id, herdId);
   }
 
@@ -75,5 +72,16 @@ export class DashboardController {
   @ApiResponse({ status: 500, description: 'Error interno del servidor' })
   getPaddockStatuses(@Param('farmId') farmId: string, @Request() req: any) {
     return this.dashboardService.getPaddockStatuses(farmId, req.user.id);
+  }
+
+  @Get(':farmId/decision-today')
+  @ApiOperation({ summary: 'Obtener decisión diaria inteligente (El Cerebro)' })
+  @ApiResponse({ status: 200, description: 'Decisión calculada con confianza y explicación' })
+  @ApiResponse({ status: 401, description: 'No autenticado' })
+  @ApiResponse({ status: 403, description: 'Acceso denegado a la finca' })
+  @ApiResponse({ status: 404, description: 'No hay movimiento activo' })
+  @ApiResponse({ status: 500, description: 'Error interno del servidor' })
+  getDecisionToday(@Param('farmId') farmId: string, @Request() req: any) {
+    return this.dashboardService.getDecisionToday(farmId, req.user.id);
   }
 }

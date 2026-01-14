@@ -51,12 +51,15 @@ export function FincaDashboard() {
         return;
       }
 
+      // Obtener farmId del usuario (asumiendo que está en el token o localStorage)
+      // Por ahora usamos un farmId mock, pero debería venir del contexto de usuario
+      const farmId = localStorage.getItem('selectedFarmId') || 'farm-1';
+
       /**
-       * Carga de alertas de sobrepastoreo desde la API backend.
-       * Se usa URL absoluta basada en `API_URL` para evitar 404 al resolver
-       * rutas relativas en el servidor de Next (puerto 3001) durante desarrollo.
+       * Carga de datos desde el endpoint /dashboard/summary
+       * Este endpoint incluye KPIs completos y alertas del sistema
        */
-      const alertsResponse = await fetch(`${API_URL}/movements/alerts/overgrazing`, {
+      const summaryResponse = await fetch(`${API_URL}/dashboard/summary?farmId=${farmId}`, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
@@ -64,7 +67,7 @@ export function FincaDashboard() {
       });
 
       // Manejo de respuestas de autenticación
-      if (alertsResponse.status === 401 || alertsResponse.status === 403) {
+      if (summaryResponse.status === 401 || summaryResponse.status === 403) {
         notificationService.error('Sesión expirada', 'auth-error');
         authService.logout();
         router.push('/auth/login');
@@ -72,39 +75,33 @@ export function FincaDashboard() {
         return;
       }
 
-      if (!alertsResponse.ok) {
+      if (!summaryResponse.ok) {
         const traceId = Math.random().toString(36).substring(7);
         console.error(
-          `Error en endpoint: ${alertsResponse.status} ${alertsResponse.statusText}`,
+          `Error en endpoint: ${summaryResponse.status} ${summaryResponse.statusText}`,
           traceId
         );
-        notificationService.error(`Error al cargar alertas (${alertsResponse.status})`, traceId);
+        notificationService.error(`Error al cargar dashboard (${summaryResponse.status})`, traceId);
         setLoading(false);
         return;
       }
 
-      const rawData = await alertsResponse.json();
-      const parseResult = OvergrazingAlertsResponseSchema.safeParse(rawData);
+      const summaryData = await summaryResponse.json();
 
-      if (!parseResult.success) {
-        console.error('Schema validation error:', parseResult.error);
-        notificationService.error('Datos inválidos del servidor', 'schema-error');
-        setLoading(false);
-        return;
-      }
+      // Extraer alertas del summary
+      setAlerts(summaryData.alerts || []);
 
-      const alertsData = parseResult.data;
-      setAlerts(alertsData.data || []);
-
-      // Calcular métricas basadas en alertas validadas
-      const criticalCount = alertsData.criticalAlerts || 0;
-      const highCount = alertsData.highAlerts || 0;
-      const overallHealth = criticalCount > 0 ? 'CRITICAL' : highCount > 0 ? 'CAUTION' : 'GOOD';
+      // Calcular métricas desde el summary
+      const criticalAlerts =
+        summaryData.alerts?.filter((a: any) => a.severity === 'HIGH').length || 0;
+      const mediumAlerts =
+        summaryData.alerts?.filter((a: any) => a.severity === 'MEDIUM').length || 0;
+      const overallHealth = criticalAlerts > 0 ? 'CRITICAL' : mediumAlerts > 0 ? 'CAUTION' : 'GOOD';
 
       setMetrics({
-        totalActiveHerds: alertsData.data?.length || 0,
-        paddocksAtRest: 0, // Se puede calcular desde otra fuente
-        activeMovements: alertsData.data?.length || 0,
+        totalActiveHerds: summaryData.totalHerds || 0,
+        paddocksAtRest: summaryData.paddocksNeedingRest || 0,
+        activeMovements: summaryData.activeMovements || 0,
         overallHealth,
       });
     } catch (error) {

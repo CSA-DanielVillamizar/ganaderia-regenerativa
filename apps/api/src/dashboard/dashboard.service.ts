@@ -1,7 +1,13 @@
 import { Injectable, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
 import { MovementService } from '../movement/movement.service';
-import { DashboardSummaryDto, DashboardAlert, PaddockStatusDto } from './dto/dashboard-summary.dto';
+import {
+  DashboardSummaryDto,
+  DashboardAlert,
+  PaddockStatusDto,
+  DecisionTodayResponse,
+  ChecklistItem,
+} from './dto/dashboard-summary.dto';
 
 const UA_WEIGHT = 450;
 
@@ -9,7 +15,7 @@ const UA_WEIGHT = 450;
 export class DashboardService {
   constructor(
     private prisma: PrismaService,
-    private movementService: MovementService,
+    private movementService: MovementService
   ) {}
 
   /**
@@ -36,7 +42,10 @@ export class DashboardService {
 
     const totalHerds = herds.length;
     const totalAnimals = herds.reduce((sum: number, h: any) => sum + h.animalCount, 0);
-    const totalWeight = herds.reduce((sum: number, h: any) => sum + (h.currentWeight || h.initialWeight || 0) * h.animalCount, 0);
+    const totalWeight = herds.reduce(
+      (sum: number, h: any) => sum + (h.currentWeight || h.initialWeight || 0) * h.animalCount,
+      0
+    );
     const totalUA = totalWeight / UA_WEIGHT;
     const averageWeightPerAnimal = totalAnimals > 0 ? totalWeight / totalAnimals : 0;
 
@@ -69,12 +78,15 @@ export class DashboardService {
       orderBy: { exitDate: 'desc' },
     });
 
-    const avgOccupancy = closedMovements.length > 0
-      ? closedMovements.reduce((sum: number, m: any) => {
-          const days = Math.floor((m.exitDate!.getTime() - m.entryDate.getTime()) / (1000 * 60 * 60 * 24));
-          return sum + days;
-        }, 0) / closedMovements.length
-      : null;
+    const avgOccupancy =
+      closedMovements.length > 0
+        ? closedMovements.reduce((sum: number, m: any) => {
+            const days = Math.floor(
+              (m.exitDate!.getTime() - m.entryDate.getTime()) / (1000 * 60 * 60 * 24)
+            );
+            return sum + days;
+          }, 0) / closedMovements.length
+        : null;
 
     // Contar potreros que necesitan más descanso
     const paddocks = await this.prisma.paddock.findMany({
@@ -265,7 +277,7 @@ export class DashboardService {
     for (const paddock of paddocks) {
       const restDays = await this.movementService.calculatePaddockRestDays(paddock.id);
       const minRest = paddock.minRestDays || 21;
-      
+
       if (restDays !== null && restDays < minRest) {
         alerts.push({
           type: 'INSUFFICIENT_REST',
@@ -342,7 +354,9 @@ export class DashboardService {
           status,
           currentHerdName: activeMovement.herd.name,
           currentUA: activeMovement.herd.currentUA || undefined,
-          uaPerHa: activeMovement.herd.currentUA ? activeMovement.herd.currentUA / paddock.hectares : undefined,
+          uaPerHa: activeMovement.herd.currentUA
+            ? activeMovement.herd.currentUA / paddock.hectares
+            : undefined,
           occupancyDays,
         });
       } else {
@@ -367,6 +381,160 @@ export class DashboardService {
     }
 
     return statuses;
+  }
+
+  /**
+   * EL CEREBRO: Decisión Diaria Inteligente
+   * Analiza el movimiento activo y recomienda cuándo mover el ganado
+   */
+  async getDecisionToday(farmId: string, userId: string): Promise<DecisionTodayResponse> {
+    await this.verifyFarmAccess(farmId, userId);
+
+    const now = new Date();
+
+    // Buscar movimiento activo
+    const activeMovement = await this.prisma.movement.findFirst({
+      where: {
+        herd: { farmId },
+        status: 'ACTIVE',
+      },
+      include: {
+        herd: true,
+        paddock: true,
+      },
+      orderBy: { entryDate: 'desc' },
+    });
+
+    // Si no hay movimiento activo, retornar estado sin recomendación
+    if (!activeMovement) {
+      return {
+        farmId,
+        timestamp: now.toISOString(),
+        hasActiveMovement: false,
+        confidence: 0,
+        recommendation: 'NO_ACTIVE_MOVEMENT',
+        explanation: 'No hay lotes en pastoreo activo. Revisa el estado de tus lotes y potreros.',
+        checklist: [
+          {
+            id: 'no-movement',
+            label: 'Sin movimiento activo',
+            status: 'WARNING',
+            description: 'Considera iniciar un movimiento para comenzar el pastoreo',
+          },
+        ],
+      };
+    }
+
+    // Calcular días en potrero actual
+    const daysInPaddock = Math.floor(
+      (now.getTime() - activeMovement.entryDate.getTime()) / (1000 * 60 * 60 * 24)
+    );
+
+    // Valores recomendados para pastoreo regenerativo:
+    // - Ocupación máxima: 1-3 días (evitar sobrepastoreo)
+    // - Descanso mínimo: 21-60 días (permitir recuperación del pasto)
+    const maxAllowedDays = 3; // Estándar PRV (Pastoreo Racional Voisin)
+    const minRestDays = activeMovement.paddock.minRestDays || 21;
+
+    // Calcular confianza (0-100)
+    // - Si daysInPaddock >= maxAllowedDays => 90-100% confianza (MOVER YA)
+    // - Si daysInPaddock == maxAllowedDays - 1 => 60-80% confianza (PREPARAR)
+    // - Si daysInPaddock < maxAllowedDays - 1 => 0-50% confianza (ESPERAR)
+    let confidence = 0;
+    let recommendation: 'MOVE_NOW' | 'WAIT' | 'INSPECT' = 'WAIT';
+    let explanation = '';
+
+    if (daysInPaddock >= maxAllowedDays) {
+      confidence = 95;
+      recommendation = 'MOVE_NOW';
+      explanation = `⚠️ El lote "${activeMovement.herd.name}" lleva ${daysInPaddock} días en "${activeMovement.paddock.name}" (máximo recomendado: ${maxAllowedDays} días). Es momento de rotar para evitar sobrepastoreo.`;
+    } else if (daysInPaddock === maxAllowedDays - 1) {
+      confidence = 70;
+      recommendation = 'INSPECT';
+      explanation = `🔍 El lote "${activeMovement.herd.name}" lleva ${daysInPaddock} días en "${activeMovement.paddock.name}". Mañana cumple el límite de ${maxAllowedDays} días. Revisa el forraje y prepara el siguiente potrero.`;
+    } else {
+      confidence = 30;
+      recommendation = 'WAIT';
+      explanation = `✅ El lote "${activeMovement.herd.name}" lleva ${daysInPaddock} días en "${activeMovement.paddock.name}". Aún quedan ${maxAllowedDays - daysInPaddock} días antes del máximo recomendado.`;
+    }
+
+    // Generar checklist
+    const checklist: ChecklistItem[] = [
+      {
+        id: 'days-in-paddock',
+        label: `Días en potrero: ${daysInPaddock}/${maxAllowedDays}`,
+        status:
+          daysInPaddock >= maxAllowedDays
+            ? 'WARNING'
+            : daysInPaddock === maxAllowedDays - 1
+              ? 'PENDING'
+              : 'COMPLETE',
+        description: `El ganado ha pastoreado durante ${daysInPaddock} días`,
+      },
+      {
+        id: 'forage-check',
+        label: 'Verificar disponibilidad de forraje',
+        status: recommendation === 'MOVE_NOW' ? 'WARNING' : 'PENDING',
+        description: 'Realizar aforo visual o medición de kg MS/ha',
+      },
+      {
+        id: 'next-paddock',
+        label: 'Identificar siguiente potrero',
+        status: 'PENDING',
+        description: 'Seleccionar potrero con descanso adecuado',
+      },
+      {
+        id: 'water-check',
+        label: 'Verificar agua y minerales',
+        status: 'COMPLETE',
+        description: 'Confirmar disponibilidad en el siguiente potrero',
+      },
+    ];
+
+    // Buscar mejor potrero para la próxima rotación
+    const paddocks = await this.prisma.paddock.findMany({
+      where: {
+        farmId,
+        deletedAt: null,
+        id: { not: activeMovement.paddockId }, // Excluir potrero actual
+      },
+    });
+
+    let nextPaddock: DecisionTodayResponse['nextPaddock'] = undefined;
+
+    for (const paddock of paddocks) {
+      const restDays = await this.movementService.calculatePaddockRestDays(paddock.id);
+
+      if (restDays !== null && restDays >= minRestDays) {
+        nextPaddock = {
+          paddockId: paddock.id,
+          paddockName: paddock.name,
+          restDays,
+          minRestDays,
+          hectares: paddock.hectares,
+        };
+        break; // Tomar el primero disponible
+      }
+    }
+
+    return {
+      farmId,
+      timestamp: now.toISOString(),
+      hasActiveMovement: true,
+      confidence,
+      recommendation,
+      explanation,
+      checklist,
+      currentMovement: {
+        movementId: activeMovement.id,
+        herdName: activeMovement.herd.name,
+        paddockName: activeMovement.paddock.name,
+        entryDate: activeMovement.entryDate.toISOString(),
+        daysInPaddock,
+        maxAllowedDays,
+      },
+      nextPaddock,
+    };
   }
 
   private async verifyFarmAccess(farmId: string, userId: string) {
