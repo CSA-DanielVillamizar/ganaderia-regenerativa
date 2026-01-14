@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { RootLayoutClient } from './layout-client';
 import '@web/styles/globals.css';
 
@@ -7,18 +7,19 @@ export const metadata: Metadata = {
   description: 'Sistema de rotación regenerativa con principios Voisin para ganaderos',
   icons: { icon: '/favicon.ico' },
   manifest: '/manifest.json',
-  themeColor: '#166534',
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 5,
-    userScalable: true,
-  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
     title: 'Ganadería',
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: '#166534',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

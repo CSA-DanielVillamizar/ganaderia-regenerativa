@@ -3,11 +3,8 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { FormField, DatePicker, Select, FormActions } from '@/components/forms';
-import {
-  createMovement,
-  calculateEstimatedExit,
-  type MovementResponse,
-} from '@/services/movement.service';
+import { createMovement, calculateEstimatedExit } from '@/services/movement.service';
+import type { MovementResponse } from '@ganaderia/shared';
 
 interface PageProps {
   params: {
@@ -46,9 +43,7 @@ export default function MovementNewPage({ params }: PageProps) {
   // Form state
   const [herdId, setHerdId] = useState(herdIdParam || '');
   const [paddockId, setPaddockId] = useState(paddockIdParam || '');
-  const [entryDate, setEntryDate] = useState(
-    new Date().toISOString().split('T')[0]
-  );
+  const [entryDate, setEntryDate] = useState(new Date().toISOString().split('T')[0]);
   const [estimatedExitDate, setEstimatedExitDate] = useState('');
 
   // Cargar datos
@@ -98,19 +93,20 @@ export default function MovementNewPage({ params }: PageProps) {
 
   // IDs inválidos en query
   const herdIdIsInvalid = useMemo(() => {
-    return Boolean(herdIdParam) && herds.length > 0 && !herds.find(h => h.id === herdIdParam);
+    return Boolean(herdIdParam) && herds.length > 0 && !herds.find((h) => h.id === herdIdParam);
   }, [herdIdParam, herds]);
   const paddockIdIsInvalid = useMemo(() => {
-    return Boolean(paddockIdParam) && paddocks.length > 0 && !paddocks.find(p => p.id === paddockIdParam);
+    return (
+      Boolean(paddockIdParam) &&
+      paddocks.length > 0 &&
+      !paddocks.find((p) => p.id === paddockIdParam)
+    );
   }, [paddockIdParam, paddocks]);
 
   // Recalcular fecha salida cuando cambien parámetros o fecha
   useEffect(() => {
     if (parameters && entryDate) {
-      const calculated = calculateEstimatedExit(
-        entryDate,
-        parameters.minimumRestDays
-      );
+      const calculated = calculateEstimatedExit(entryDate, parameters.minimumRestDays);
       setEstimatedExitDate(calculated);
     }
   }, [entryDate, parameters]);
@@ -138,14 +134,10 @@ export default function MovementNewPage({ params }: PageProps) {
         estimatedExitDate,
       });
 
-      const herdName =
-        herds.find((h) => h.id === herdId)?.name || 'Lote';
-      const paddockName =
-        paddocks.find((p) => p.id === paddockId)?.name || 'Potrero';
+      const herdName = herds.find((h) => h.id === herdId)?.name || 'Lote';
+      const paddockName = paddocks.find((p) => p.id === paddockId)?.name || 'Potrero';
 
-      const message = encodeURIComponent(
-        `✅ Movimiento registrado: ${herdName} → ${paddockName}`
-      );
+      const message = encodeURIComponent(`✅ Movimiento registrado: ${herdName} → ${paddockName}`);
       router.push(`/farms/${params.id}/decision-today?status=success&toast=${message}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al guardar');
@@ -176,9 +168,7 @@ export default function MovementNewPage({ params }: PageProps) {
     <div className="max-w-md mx-auto py-8 px-4">
       <div className="bg-white rounded-lg shadow-md p-6 space-y-4">
         <h1 className="text-2xl font-bold text-gray-800">🐄 Registrar Movimiento</h1>
-        <p className="text-sm text-gray-600">
-          Entrada del lote a potrero
-        </p>
+        <p className="text-sm text-gray-600">Entrada del lote a potrero</p>
 
         {(error || herdIdIsInvalid || paddockIdIsInvalid) && (
           <div className="bg-red-100 text-red-700 px-4 py-2 rounded text-sm space-y-2">
@@ -233,9 +223,7 @@ export default function MovementNewPage({ params }: PageProps) {
             <div className="space-y-1 text-sm">
               <p>
                 <span className="text-gray-600">Descanso Mínimo:</span>{' '}
-                <span className="font-bold text-green-600">
-                  {parameters.minimumRestDays} días
-                </span>
+                <span className="font-bold text-green-600">{parameters.minimumRestDays} días</span>
               </p>
               <p>
                 <span className="text-gray-600">Salida Estimada:</span>{' '}

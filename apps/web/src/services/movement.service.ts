@@ -268,6 +268,19 @@ export function calculateOccupancyDays(entryDate: string, exitDate: string): num
 }
 
 /**
+ * Calcula la fecha de salida estimada sumando días mínimos de descanso
+ * a la fecha de entrada. Devuelve string en formato YYYY-MM-DD.
+ */
+export function calculateEstimatedExit(entryDate: string, minimumRestDays: number): string {
+  const date = new Date(entryDate);
+  if (Number.isFinite(minimumRestDays)) {
+    date.setDate(date.getDate() + Number(minimumRestDays));
+  }
+  // Formato ISO corto (YYYY-MM-DD)
+  return date.toISOString().split('T')[0];
+}
+
+/**
  * Formatea fecha a string DD/MM/YYYY
  */
 export function formatDate(dateString: string): string {

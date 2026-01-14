@@ -3,12 +3,8 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { FormField, DatePicker, TextArea, FormActions } from '@/components/forms';
-import {
-  closeMovement,
-  calculateOccupancyDays,
-  formatDate,
-  type MovementResponse,
-} from '@/services/movement.service';
+import { closeMovement, calculateOccupancyDays, formatDate } from '@/services/movement.service';
+import type { MovementResponse } from '@ganaderia/shared';
 
 interface PageProps {
   params: {
@@ -79,10 +75,7 @@ export default function MovementClosePage({ params }: PageProps) {
         notes: notes || undefined,
       });
 
-      const occupancy = calculateOccupancyDays(
-        movement.entryDate,
-        exitDate
-      );
+      const occupancy = calculateOccupancyDays(movement.entryDate, exitDate);
 
       const message = encodeURIComponent(`✅ Movimiento cerrado - Ocupación: ${occupancy} días`);
       router.push(`/farms/${params.id}/decision-today?status=success&toast=${message}`);
@@ -134,15 +127,9 @@ export default function MovementClosePage({ params }: PageProps) {
     <div className="max-w-md mx-auto py-8 px-4">
       <div className="bg-white rounded-lg shadow-md p-6 space-y-4">
         <h1 className="text-2xl font-bold text-gray-800">🚪 Cerrar Movimiento</h1>
-        <p className="text-sm text-gray-600">
-          Registrar salida del lote del potrero
-        </p>
+        <p className="text-sm text-gray-600">Registrar salida del lote del potrero</p>
 
-        {error && (
-          <div className="bg-red-100 text-red-700 px-4 py-2 rounded text-sm">
-            {error}
-          </div>
-        )}
+        {error && <div className="bg-red-100 text-red-700 px-4 py-2 rounded text-sm">{error}</div>}
 
         {/* Información Read-Only */}
         <div className="bg-gray-50 p-4 rounded-md space-y-2">
@@ -200,10 +187,7 @@ export default function MovementClosePage({ params }: PageProps) {
                 <p className="text-gray-600">vs. Estimado</p>
                 <p className="text-lg font-bold text-blue-600">
                   {movement.estimatedExitDate
-                    ? calculateOccupancyDays(
-                        movement.entryDate,
-                        movement.estimatedExitDate
-                      )
+                    ? calculateOccupancyDays(movement.entryDate, movement.estimatedExitDate)
                     : '-'}
                 </p>
               </div>
