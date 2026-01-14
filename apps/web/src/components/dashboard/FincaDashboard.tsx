@@ -28,6 +28,8 @@ export function FincaDashboard() {
   const [metrics, setMetrics] = useState<FincaDashboardMetrics | null>(null);
   const [alerts, setAlerts] = useState<OvergrazingAlert[]>([]);
   const [loading, setLoading] = useState(true);
+  // Agregado para testing E2E
+  const testIdPrefix = 'finca-dashboard';
 
   useEffect(() => {
     loadDashboardData();
@@ -153,11 +155,14 @@ export function FincaDashboard() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-testid="finca-dashboard">
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4" data-testid="dashboard-kpi-cards">
         {/* Total Lotes Activos */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+        <div
+          className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
+          data-testid="dashboard-kpi-herds"
+        >
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Lotes Activos</p>
@@ -171,7 +176,10 @@ export function FincaDashboard() {
         </div>
 
         {/* Potreros en Descanso */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+        <div
+          className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
+          data-testid="dashboard-kpi-paddocks"
+        >
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Potreros en Descanso</p>
@@ -185,7 +193,10 @@ export function FincaDashboard() {
         </div>
 
         {/* Alertas Activas */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+        <div
+          className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
+          data-testid="dashboard-kpi-alerts"
+        >
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Alertas Activas</p>
@@ -206,7 +217,10 @@ export function FincaDashboard() {
         </div>
 
         {/* Estado General */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+        <div
+          className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
+          data-testid="dashboard-kpi-health"
+        >
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Estado General</p>
@@ -222,16 +236,20 @@ export function FincaDashboard() {
 
       {/* Alertas de Sobrepastoreo */}
       {alerts.length > 0 && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+        <div
+          className="bg-red-50 border border-red-200 rounded-lg p-6"
+          data-testid="dashboard-alerts-section"
+        >
           <div className="flex items-center gap-3 mb-4">
             <AlertTriangle className="text-red-600" size={24} />
             <h3 className="text-lg font-semibold text-red-900">Alertas de Sobrepastoreo</h3>
           </div>
 
           <div className="space-y-3">
-            {alerts.map((alert) => (
+            {alerts.map((alert, idx) => (
               <div
                 key={alert.id}
+                data-testid={`alert-item-${idx}`}
                 className={`p-4 rounded-lg ${
                   alert.severity === 'CRITICAL'
                     ? 'bg-red-100 border border-red-300'
@@ -286,7 +304,10 @@ export function FincaDashboard() {
 
       {/* Estado OK */}
       {alerts.length === 0 && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
+        <div
+          className="bg-green-50 border border-green-200 rounded-lg p-6 text-center"
+          data-testid="dashboard-no-alerts"
+        >
           <CheckCircle2 className="text-green-600 mx-auto mb-2" size={32} />
           <p className="text-green-900 font-semibold">
             ¡Sin alertas de sobrepastoreo! La rotación está funcionando óptimamente.

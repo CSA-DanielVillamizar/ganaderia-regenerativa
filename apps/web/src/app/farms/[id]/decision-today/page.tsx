@@ -98,11 +98,12 @@ export default function DecisionTodayPage({ params }: { params: { id: string } }
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-6 space-y-8">
+    <div className="max-w-5xl mx-auto p-6 space-y-8" data-testid="decision-today-page">
       <h1 className="text-3xl font-bold text-gray-900">🧭 Decision Today</h1>
 
       {toast && (
         <div
+          data-testid={`toast-${toast.type}`}
           className={`rounded p-4 border ${toast.type === 'success' ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800'}`}
         >
           {toast.message}
@@ -110,7 +111,7 @@ export default function DecisionTodayPage({ params }: { params: { id: string } }
       )}
 
       {/* Confianza + Explicabilidad */}
-      <section className="space-y-3">
+      <section className="space-y-3" data-testid="confidence-section">
         <div className="flex items-center gap-3">
           <span className="text-sm text-gray-600">Nivel de confianza</span>
           <div className="flex-1 h-2 bg-gray-200 rounded">
@@ -122,7 +123,10 @@ export default function DecisionTodayPage({ params }: { params: { id: string } }
           <p className="text-xs text-gray-500">Clasificación: {dashboard.confidenceLevel}</p>
         )}
         {dashboard?.explainability && (
-          <div className="bg-gray-50 border border-gray-200 rounded p-4 text-sm text-gray-700">
+          <div
+            className="bg-gray-50 border border-gray-200 rounded p-4 text-sm text-gray-700"
+            data-testid="explain-section"
+          >
             {dashboard.explainability}
           </div>
         )}
@@ -130,11 +134,15 @@ export default function DecisionTodayPage({ params }: { params: { id: string } }
 
       {/* Checklist de acciones */}
       {dashboard?.actionChecklist && dashboard.actionChecklist.length > 0 && (
-        <section>
+        <section data-testid="checklist-section">
           <h2 className="text-xl font-semibold text-gray-900 mb-3">Lista de acciones</h2>
           <ul className="space-y-2">
             {dashboard.actionChecklist.map((item, idx) => (
-              <li key={item.id ?? idx} className="flex items-center gap-2 text-sm">
+              <li
+                key={item.id ?? idx}
+                className="flex items-center gap-2 text-sm"
+                data-testid={`checklist-item-${idx}`}
+              >
                 <span
                   className={`inline-flex w-5 h-5 items-center justify-center rounded-full border ${item.done ? 'bg-green-600 border-green-600 text-white' : 'bg-white border-gray-300 text-gray-400'}`}
                   aria-label={item.done ? 'Hecho' : 'Pendiente'}
@@ -151,9 +159,12 @@ export default function DecisionTodayPage({ params }: { params: { id: string } }
       )}
 
       {/* CTAs */}
-      <section className="space-y-6">
+      <section className="space-y-6" data-testid="ctas-section">
         {/* Aforo */}
-        <div className="rounded border p-4 bg-white flex items-center justify-between">
+        <div
+          className="rounded border p-4 bg-white flex items-center justify-between"
+          data-testid="cta-forage"
+        >
           <div>
             <p className="font-medium text-gray-800">🌱 Registrar Aforo</p>
             <p className="text-xs text-gray-500">
@@ -176,7 +187,10 @@ export default function DecisionTodayPage({ params }: { params: { id: string } }
         </div>
 
         {/* Pesaje */}
-        <div className="rounded border p-4 bg-white flex items-center justify-between">
+        <div
+          className="rounded border p-4 bg-white flex items-center justify-between"
+          data-testid="cta-weighing"
+        >
           <div>
             <p className="font-medium text-gray-800">⚖️ Registrar Pesaje</p>
             <p className="text-xs text-gray-500">
@@ -199,7 +213,10 @@ export default function DecisionTodayPage({ params }: { params: { id: string } }
         </div>
 
         {/* Movimiento (entrada) */}
-        <div className="rounded border p-4 bg-white flex items-center justify-between">
+        <div
+          className="rounded border p-4 bg-white flex items-center justify-between"
+          data-testid="cta-movement"
+        >
           <div>
             <p className="font-medium text-gray-800">🚚 Registrar Movimiento</p>
             <p className="text-xs text-gray-500">
@@ -225,7 +242,10 @@ export default function DecisionTodayPage({ params }: { params: { id: string } }
         </div>
 
         {/* Cierre de movimiento activo */}
-        <div className="rounded border p-4 bg-white flex items-center justify-between">
+        <div
+          className="rounded border p-4 bg-white flex items-center justify-between"
+          data-testid="cta-close-movement"
+        >
           <div>
             <p className="font-medium text-gray-800">✅ Cerrar Movimiento</p>
             <p className="text-xs text-gray-500">
