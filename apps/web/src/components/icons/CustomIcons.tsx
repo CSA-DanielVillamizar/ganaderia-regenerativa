@@ -1,59 +1,29 @@
-import React from 'react';
-
-interface IconProps extends React.SVGProps<SVGSVGElement> {
-  className?: string;
-  size?: number;
-}
+import { forwardRef } from 'react';
 
 /**
- * Icono de Vaca - Estilo Lucide React
+ * Icono de Vaca - Perfil Lateral Estilo Lucide React
  * Para PWA Install Prompt y branding
  */
-export const Cow = React.forwardRef<SVGSVGElement, IconProps>(
-  ({ className = '', size = 24, ...props }, ref) => (
-    <svg
-      ref={ref}
-      xmlns="http://www.w3.org/2000/svg"
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-      {...props}
-    >
-      {/* Cabeza */}
-      <circle cx="12" cy="10" r="6" />
+export const CowIcon = forwardRef<SVGSVGElement, React.SVGProps<SVGSVGElement>>((props, ref) => (
+  <svg
+    ref={ref}
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <path d="M4 14c0 2 2 2 2 4v2" />
+    <path d="M20 14c0 2-2 2-2 4v2" />
+    <path d="M20 10V6a2 2 0 0 0-2-2h-3l-2-2h-4L7 6H4a2 2 0 0 0-2 2v2" />
+    <path d="M4 14h16" />
+    <path d="M2 10h3" />
+  </svg>
+));
+CowIcon.displayName = 'CowIcon';
 
-      {/* Orejas */}
-      <path d="M 7 6 Q 6 4 5 3" />
-      <path d="M 17 6 Q 18 4 19 3" />
-
-      {/* Ojos */}
-      <circle cx="10" cy="9" r="1" fill="currentColor" />
-      <circle cx="14" cy="9" r="1" fill="currentColor" />
-
-      {/* Hocico */}
-      <path d="M 11 11 Q 12 12 13 11" />
-      <path d="M 11 11 L 10 13" />
-      <path d="M 13 11 L 14 13" />
-
-      {/* Cuerpo */}
-      <ellipse cx="12" cy="18" rx="5" ry="3" />
-
-      {/* Patas */}
-      <line x1="9" y1="20" x2="9" y2="23" />
-      <line x1="12" y1="20" x2="12" y2="23" />
-      <line x1="15" y1="20" x2="15" y2="23" />
-      <line x1="18" y1="20" x2="18" y2="23" />
-
-      {/* Cola */}
-      <path d="M 16 17 Q 19 17 20 15" />
-    </svg>
-  )
-);
-
-Cow.displayName = 'Cow';
+// Alias para compatibilidad hacia atrás
+export const Cow = CowIcon;

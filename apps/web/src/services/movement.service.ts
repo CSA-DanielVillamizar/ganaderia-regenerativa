@@ -257,26 +257,31 @@ export async function closeMovement(movementId: string, actualExitDate: string):
 }
 
 /**
- * Calcula días de ocupación entre entrada y salida
+ * Calcula días de ocupación entre entrada y salida (incluye día de entrada +1)
  */
 export function calculateOccupancyDays(entryDate: string, exitDate: string): number {
+  if (!entryDate || !exitDate) return 0;
   const entry = new Date(entryDate);
   const exit = new Date(exitDate);
-  const diffTime = Math.abs(exit.getTime() - entry.getTime());
+  if (isNaN(entry.getTime()) || isNaN(exit.getTime())) return 0;
+  const diffTime = exit.getTime() - entry.getTime();
+  if (diffTime < 0) return 0;
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  return diffDays;
+  return diffDays + 1;
 }
 
 /**
  * Calcula la fecha de salida estimada sumando días mínimos de descanso
  * a la fecha de entrada. Devuelve string en formato YYYY-MM-DD.
  */
-export function calculateEstimatedExit(entryDate: string, minimumRestDays: number): string {
+export function calculateEstimatedExit(entryDate: string, days: number): string {
   const date = new Date(entryDate);
-  if (Number.isFinite(minimumRestDays)) {
-    date.setDate(date.getDate() + Number(minimumRestDays));
+  if (isNaN(date.getTime())) {
+    console.error(`Fecha de entrada inválida: ${entryDate}`);
+    return '';
   }
-  // Formato ISO corto (YYYY-MM-DD)
+  if (!Number.isFinite(days) || days < 0) return entryDate;
+  date.setDate(date.getDate() + Math.floor(days));
   return date.toISOString().split('T')[0];
 }
 

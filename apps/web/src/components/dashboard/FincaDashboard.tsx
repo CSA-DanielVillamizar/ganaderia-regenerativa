@@ -1,10 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { AlertTriangle, TrendingUp, AlertCircle, CheckCircle2 } from 'lucide-react';
-import { OvergrazingAlert } from '@ganaderia/shared';
+import { OvergrazingAlert, OvergrazingAlertsResponseSchema } from '@ganaderia/shared';
 import { SkeletonLoader } from '../common/SkeletonLoader';
 import { notificationService } from '@web/services/notification.service';
+import { authService } from '@web/services/auth.service';
 
 interface FincaDashboardMetrics {
   totalActiveHerds: number;
@@ -21,6 +23,7 @@ interface FincaDashboardMetrics {
  * - Alertas de sobrepastoreo en tiempo real
  */
 export function FincaDashboard() {
+  const router = useRouter();
   const [metrics, setMetrics] = useState<FincaDashboardMetrics | null>(null);
   const [alerts, setAlerts] = useState<OvergrazingAlert[]>([]);
   const [loading, setLoading] = useState(true);
@@ -36,16 +39,36 @@ export function FincaDashboard() {
     try {
       setLoading(true);
 
+      // Obtener token de autenticación
+      const token = authService.getToken();
+      if (!token) {
+        notificationService.error('Sesión no válida', 'auth-error');
+        router.push('/auth/login');
+        return;
+      }
+
       // Cargar alertas
-      const alertsResponse = await fetch('/api/movements/alerts/overgrazing', {
-        headers: { 'Content-Type': 'application/json' },
+      const alertsResponse = await fetch('/api/v1/movements/alerts/overgrazing', {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       if (alertsResponse.ok) {
-        const alertsData = await alertsResponse.json();
+        const rawData = await alertsResponse.json();
+        const parseResult = OvergrazingAlertsResponseSchema.safeParse(rawData);
+
+        if (!parseResult.success) {
+          console.error('Schema validation error:', parseResult.error);
+          notificationService.error('Datos inválidos del servidor', 'schema-error');
+          return;
+        }
+
+        const alertsData = parseResult.data;
         setAlerts(alertsData.data || []);
 
-        // Calcular métricas basadas en alertas
+        // Calcular métricas basadas en alertas validadas
         const criticalCount = alertsData.criticalAlerts || 0;
         const highCount = alertsData.highAlerts || 0;
         const overallHealth = criticalCount > 0 ? 'CRITICAL' : highCount > 0 ? 'CAUTION' : 'GOOD';

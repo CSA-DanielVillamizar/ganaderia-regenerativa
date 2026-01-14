@@ -231,25 +231,33 @@ export const DashboardSummaryResponseSchema = z.object({
   uaPerHectare: z.number().optional(),
   avgOccupancyDays: z.number().optional(),
   paddocksNeedingRest: z.number().optional(),
-  alerts: z.array(z.object({
-    type: z.enum(['OVERGRAZING', 'INSUFFICIENT_REST', 'MISSING_DATA']),
-    severity: z.enum(['high', 'medium', 'low']),
-    message: z.string(),
-    paddockName: z.string().optional(),
-    herdName: z.string().optional(),
-    daysOccupied: z.number().optional(),
-    restDays: z.number().optional(),
-    minRestDays: z.number().optional(),
-  })).optional(),
-  paddockStatuses: z.array(z.object({
-    paddockId: z.string(),
-    paddockName: z.string(),
-    status: z.enum(['OCCUPIED', 'RESTING', 'READY']),
-    restDays: z.number(),
-    minRestDays: z.number().nullable(),
-    herdName: z.string().optional(),
-    daysOccupied: z.number().optional(),
-  })).optional(),
+  alerts: z
+    .array(
+      z.object({
+        type: z.enum(['OVERGRAZING', 'INSUFFICIENT_REST', 'MISSING_DATA']),
+        severity: z.enum(['high', 'medium', 'low']),
+        message: z.string(),
+        paddockName: z.string().optional(),
+        herdName: z.string().optional(),
+        daysOccupied: z.number().optional(),
+        restDays: z.number().optional(),
+        minRestDays: z.number().optional(),
+      })
+    )
+    .optional(),
+  paddockStatuses: z
+    .array(
+      z.object({
+        paddockId: z.string(),
+        paddockName: z.string(),
+        status: z.enum(['OCCUPIED', 'RESTING', 'READY']),
+        restDays: z.number(),
+        minRestDays: z.number().nullable(),
+        herdName: z.string().optional(),
+        daysOccupied: z.number().optional(),
+      })
+    )
+    .optional(),
 });
 
 export type DashboardSummaryResponse = z.infer<typeof DashboardSummaryResponseSchema>;
@@ -360,7 +368,7 @@ export const OvergrazingAlertSchema = z.object({
   daysOccupied: z.number(),
   maxAllowedDays: z.number(),
   exceedDays: z.number(),
-  entryDate: z.date(),
+  entryDate: z.union([z.string(), z.date()]).transform((val) => new Date(val)),
   severity: z.enum(['MEDIUM', 'HIGH', 'CRITICAL']),
 });
 

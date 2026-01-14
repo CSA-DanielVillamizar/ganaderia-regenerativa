@@ -204,3 +204,26 @@ export async function resetDb(): Promise<void> {
     dbPromise = null;
   }
 }
+
+/**
+ * Limpia todos los documentos en todas las colecciones
+ * Más agresivo que resetDb, mantiene la estructura de BD
+ */
+export async function clearAllCollections(): Promise<void> {
+  try {
+    const db = await getDb();
+
+    // Limpiar cada colección usando .find().remove() (método correcto de RxDB)
+    await db.forageSamples.find().remove();
+    await db.movements.find().remove();
+    await db.weighings.find().remove();
+    await db.syncQueue.find().remove();
+    await db.herds.find().remove();
+    await db.paddocks.find().remove();
+
+    console.log('🧹 IndexedDB limpiado completamente');
+  } catch (error) {
+    console.error('⚠️ Error limpiando IndexedDB:', error);
+    throw error;
+  }
+}

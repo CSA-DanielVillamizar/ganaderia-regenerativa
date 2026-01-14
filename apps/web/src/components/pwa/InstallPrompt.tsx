@@ -36,8 +36,9 @@ export default function InstallPrompt() {
       const promptEvent = e as BeforeInstallPromptEvent;
       setDeferredPrompt(promptEvent);
 
-      // Verificar si el usuario rechazó previamente
-      const dismissed = localStorage.getItem('pwa-install-dismissed');
+      // Verificar si el usuario rechazó previamente (usando cookies)
+      const cookies = document.cookie.split('; ');
+      const dismissed = cookies.find((c) => c.startsWith('pwa-install-dismissed'));
       if (!dismissed) {
         setShowPrompt(true);
       }
@@ -81,7 +82,10 @@ export default function InstallPrompt() {
   };
 
   const handleDismiss = () => {
-    localStorage.setItem('pwa-install-dismissed', 'true');
+    // Guardar cookie por 30 días
+    const date = new Date();
+    date.setTime(date.getTime() + 30 * 24 * 60 * 60 * 1000);
+    document.cookie = `pwa-install-dismissed=true;expires=${date.toUTCString()};path=/`;
     setShowPrompt(false);
   };
 
