@@ -14,7 +14,9 @@
     "start:prod": "node dist/apps/api/src/main",
     "build": "nest build",
     "start:dev": "npx nest build && node dist/apps/api/src/main",
-    "prisma:generate": "cross-env NODE_OPTIONS=--use-system-ca prisma generate",
+    "prisma:generate": "prisma generate",
+    "prisma:validate": "prisma validate --schema=prisma/schema.prisma",
+    "prisma:studio": "prisma studio",
     "pretest:api": "npm run prisma:generate",
     "test": "jest --runInBand",
     "test:unit": "jest src --testPathIgnorePatterns=integration --runInBand",
@@ -29,6 +31,7 @@
     "db:migrate": "prisma migrate dev",
     "db:seed": "node prisma/seed.js",
     "db:clean": "node clean-db.js",
+    "db:reset": "prisma migrate reset --force",
     "setup:basic": "node setup-basic.js"
   },
   "dependencies": {
